@@ -6,7 +6,7 @@ import { ActionDetail } from '../components/ActionDetail'
 import { ReportGenerator } from '../components/ReportGenerator'
 import { PDFService } from '../lib/pdfService'
 import { actionsApi, type Action } from '../lib/api'
-import { useToast } from '../components/Toast'
+import { useToast, createSuccessToast, createErrorToast } from '../components/Toast'
 
 export const ActionsPage: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([])
@@ -21,7 +21,7 @@ export const ActionsPage: React.FC = () => {
   const [showActionDetail, setShowActionDetail] = useState(false)
   const [selectedAction, setSelectedAction] = useState<Action | undefined>(undefined)
   const [showReportGenerator, setShowReportGenerator] = useState(false)
-  const { showToast } = useToast()
+  const { addToast } = useToast()
 
   // Charger les actions et statistiques
   const loadActions = async () => {
@@ -42,7 +42,7 @@ export const ActionsPage: React.FC = () => {
       setStats(statsResponse)
     } catch (error) {
       console.error('Erreur lors du chargement des actions:', error)
-      showToast('Erreur lors du chargement des actions', 'error')
+      addToast(createErrorToast('Erreur lors du chargement des actions'))
     } finally {
       setLoading(false)
     }
@@ -58,10 +58,10 @@ export const ActionsPage: React.FC = () => {
     try {
       await actionsApi.update(actionId, { status: newStatus })
       await loadActions() // Recharger les données
-      showToast('Statut mis à jour avec succès', 'success')
+      addToast(createSuccessToast('Statut mis à jour avec succès'))
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error)
-      showToast('Erreur lors de la mise à jour du statut', 'error')
+      addToast(createErrorToast('Erreur lors de la mise à jour du statut'))
     }
   }
 

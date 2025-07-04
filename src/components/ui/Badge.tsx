@@ -2,7 +2,7 @@ import React from 'react'
 import { cn } from '../../lib/utils'
 
 interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'gradient'
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'gradient' | 'outline'
   size?: 'sm' | 'md' | 'lg'
   pulse?: boolean
   children: React.ReactNode
@@ -28,7 +28,8 @@ export const Badge: React.FC<BadgeProps> = ({
     success: 'bg-gradient-to-r from-success-100 to-success-200 text-success-800 border border-success-300',
     warning: 'bg-gradient-to-r from-warning-100 to-warning-200 text-warning-800 border border-warning-300',
     danger: 'bg-gradient-to-r from-danger-100 to-danger-200 text-danger-800 border border-danger-300',
-    gradient: 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow'
+    gradient: 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow',
+    outline: 'bg-transparent text-gray-600 border border-gray-300'
   }
 
   const sizes = {

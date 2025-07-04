@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { api } from "../../lib/api";
+import type { TrendData } from "../../types/analytics"
 import { Button } from "../ui/Button"
 import { TrendingUp, BarChart3, Activity } from "lucide-react"
 

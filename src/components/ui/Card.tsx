@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils'
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
-  variant?: 'default' | 'glass' | 'gradient' | 'elevated'
+  variant?: 'default' | 'glass' | 'gradient' | 'elevated' | 'outline'
   hover?: boolean
 }
 
@@ -18,7 +18,8 @@ export const Card: React.FC<CardProps> = ({
     default: 'bg-white border border-gray-200 shadow-card',
     glass: 'glass border border-white/20 shadow-soft',
     gradient: 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-100 shadow-card',
-    elevated: 'bg-white border border-gray-100 shadow-card-hover'
+    elevated: 'bg-white border border-gray-100 shadow-card-hover',
+    outline: 'bg-transparent border-2 border-gray-300'
   }
 
   const hoverEffect = hover ? 'card-hover group' : ''

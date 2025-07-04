@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-import { useToast } from '../components/Toast'
+import { useToast, createSuccessToast, createErrorToast } from '../components/Toast'
 import { useAuth } from '../contexts/AuthContext'
 import { usersApi, tenantsApi, handleApiError } from '../lib/api'
 import { UserDetailsModal, EditUserModal } from '../components/UserModals'
@@ -63,7 +63,7 @@ export const UsersManagement: React.FC = () => {
 
   useEffect(() => {
     if (currentUser?.role !== 'SUPER_ADMIN' && currentUser?.role !== 'ADMIN') {
-      addToast('Accès refusé. Vous devez être admin ou superadmin.', 'error')
+      addToast(createErrorToast('Accès refusé. Vous devez être admin ou superadmin.'))
       return
     }
     
@@ -80,7 +80,7 @@ export const UsersManagement: React.FC = () => {
       setUsers(response.data || response)
     } catch (error) {
       console.error('Erreur lors du chargement des utilisateurs:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
       setUsers([])
     } finally {
       setIsLoading(false)
@@ -148,10 +148,10 @@ export const UsersManagement: React.FC = () => {
           ? { ...user, isActive: !user.isActive }
           : user
       ))
-      addToast('Statut de l\'utilisateur mis à jour avec succès', 'success')
+      addToast(createSuccessToast('Statut de l\'utilisateur mis à jour avec succès'))
     } catch (error) {
       console.error('Erreur lors de la mise à jour du statut:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     }
   }
 
@@ -163,10 +163,10 @@ export const UsersManagement: React.FC = () => {
     try {
       await usersApi.delete(userId)
       setUsers(prev => prev.filter(user => user.id !== userId))
-      addToast('Utilisateur supprimé avec succès', 'success')
+      addToast(createSuccessToast('Utilisateur supprimé avec succès'))
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'utilisateur:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     }
   }
 
@@ -186,7 +186,7 @@ export const UsersManagement: React.FC = () => {
     ))
     setShowEditForm(false)
     setSelectedUser(null)
-    addToast('Utilisateur mis à jour avec succès', 'success')
+    addToast(createSuccessToast('Utilisateur mis à jour avec succès'))
   }
 
   if (isLoading) {
@@ -496,7 +496,7 @@ export const UsersManagement: React.FC = () => {
           onSuccess={(newUser) => {
             setUsers(prev => [...prev, newUser])
             setShowCreateForm(false)
-            addToast('Utilisateur créé avec succès', 'success')
+            addToast(createSuccessToast('Utilisateur créé avec succès'))
           }}
           tenants={tenants}
           currentUserRole={currentUser?.role || 'READER'}
@@ -604,7 +604,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       onSuccess(newUser)
     } catch (error) {
       console.error('Erreur lors de la création de l\'utilisateur:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     } finally {
       setIsSubmitting(false)
     }

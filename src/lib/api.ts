@@ -47,14 +47,19 @@ export interface User {
   email: string
   firstName: string
   lastName: string
-  role: string
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'AI_ANALYST' | 'EVALUATOR' | 'READER'
   isActive: boolean
   lastLogin?: string
   createdAt: string
+  tenantId: string
   tenant: {
     id: string
     name: string
     slug: string
+    domain?: string
+    industry?: string
+    country?: string
+    isActive: boolean
   }
 }
 
@@ -74,13 +79,18 @@ export interface Notification {
 
 // Classe pour gérer les erreurs API
 export class ApiError extends Error {
+  public status: number
+  public details?: any
+
   constructor(
     message: string,
-    public status: number,
-    public details?: any
+    status: number,
+    details?: any
   ) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
+    this.details = details
   }
 }
 
@@ -120,7 +130,7 @@ class ApiClient {
     }
 
     if (this.token) {
-      headers.Authorization = `Bearer ${this.token}`
+      (headers as any).Authorization = `Bearer ${this.token}`
     }
 
     try {
@@ -1072,6 +1082,23 @@ export interface AnalyticsDashboardData {
   correlations: any[]
   timeSeriesData: any
   heatmapData: any
+}
+
+// Helper functions for API calls
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` })
+  }
+}
+
+const handleResponse = async (response: Response) => {
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(error || `HTTP error! status: ${response.status}`)
+  }
+  return await response.json()
 }
 
 export const analyticsApi = {

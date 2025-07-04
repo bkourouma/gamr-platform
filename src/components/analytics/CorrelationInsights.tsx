@@ -1,5 +1,5 @@
 import React from "react"
-import { api } from "../../lib/api";
+import type { CorrelationInsight } from "../../types/analytics"
 import { TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-react"
 
 interface CorrelationInsightsProps {

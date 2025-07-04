@@ -1,5 +1,5 @@
 import { prisma } from '../prisma'
-import { EmbeddingDocument, DocumentMetadata } from './types'
+import type { EmbeddingDocument, DocumentMetadata } from './types'
 
 export class DataExtractor {
   

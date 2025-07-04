@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Button } from './ui/Button'
-import { useToast } from './Toast'
+import { useToast, createSuccessToast, createErrorToast } from './Toast'
 import { usersApi, handleApiError } from '../lib/api'
 import {
   X,
@@ -227,7 +227,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
       onSuccess(updatedUser)
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'utilisateur:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     } finally {
       setIsSubmitting(false)
     }
@@ -297,7 +297,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
             </label>
             <select
               value={formData.role}
-              onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as 'SUPER_ADMIN' | 'ADMIN' | 'AI_ANALYST' | 'EVALUATOR' | 'READER' }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="READER">Lecteur</option>

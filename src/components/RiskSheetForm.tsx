@@ -71,7 +71,7 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
         ...formData,
         riskScore,
         priority,
-        tenantId: user?.tenantId,
+        tenantId: user?.tenant?.id,
         authorId: user?.id
       }
 

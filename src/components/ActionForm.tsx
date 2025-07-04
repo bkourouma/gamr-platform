@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { X, Save, Calendar, User, Target, DollarSign, Clock } from 'lucide-react'
 import { Button } from './ui/Button'
 import { actionsApi, riskSheetsApi, usersApi, type Action, type RiskSheet, type User as UserType } from '../lib/api'
-import { useToast } from './Toast'
+import { useToast, createSuccessToast, createErrorToast } from './Toast'
 
 interface ActionFormProps {
   action?: Action
@@ -27,7 +27,7 @@ export const ActionForm: React.FC<ActionFormProps> = ({ action, isOpen, onClose,
   const [users, setUsers] = useState<UserType[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const { showToast } = useToast()
+  const { addToast } = useToast()
 
   // Charger les données nécessaires
   useEffect(() => {
@@ -77,7 +77,7 @@ export const ActionForm: React.FC<ActionFormProps> = ({ action, isOpen, onClose,
       setUsers(usersResponse.data)
     } catch (error) {
       console.error('Erreur lors du chargement des données:', error)
-      showToast('Erreur lors du chargement des données', 'error')
+      addToast(createErrorToast('Erreur lors du chargement des données'))
     } finally {
       setLoading(false)
     }
@@ -87,7 +87,7 @@ export const ActionForm: React.FC<ActionFormProps> = ({ action, isOpen, onClose,
     e.preventDefault()
     
     if (!formData.title || !formData.description || !formData.riskSheetId) {
-      showToast('Veuillez remplir tous les champs obligatoires', 'error')
+      addToast(createErrorToast('Veuillez remplir tous les champs obligatoires'))
       return
     }
 
@@ -108,17 +108,17 @@ export const ActionForm: React.FC<ActionFormProps> = ({ action, isOpen, onClose,
 
       if (action) {
         await actionsApi.update(action.id, actionData)
-        showToast('Action mise à jour avec succès', 'success')
+        addToast(createSuccessToast('Action mise à jour avec succès'))
       } else {
         await actionsApi.create(actionData)
-        showToast('Action créée avec succès', 'success')
+        addToast(createSuccessToast('Action créée avec succès'))
       }
 
       onSave()
       onClose()
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error)
-      showToast('Erreur lors de la sauvegarde', 'error')
+      addToast(createErrorToast('Erreur lors de la sauvegarde'))
     } finally {
       setSaving(false)
     }

@@ -1,4 +1,4 @@
-import { SecurityQuestion, ValidationRule } from '../data/securityQuestionnaire'
+import type { SecurityQuestion, ValidationRule } from '../data/securityQuestionnaire'
 
 // Local interface definition to avoid import issues
 interface ConditionalLogic {

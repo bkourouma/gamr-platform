@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-import { useToast } from '../components/Toast'
+import { useToast, createSuccessToast, createErrorToast } from '../components/Toast'
 import { useAuth } from '../contexts/AuthContext'
 import { tenantsApi, handleApiError } from '../lib/api'
 import {
@@ -59,7 +59,7 @@ export const TenantsManagement: React.FC = () => {
 
     if (user?.role !== 'SUPER_ADMIN') {
       console.warn('Utilisateur non autorisé pour la gestion des tenants')
-      addToast('Accès refusé. Vous devez être superadmin.', 'error')
+      addToast(createErrorToast('Accès refusé. Vous devez être superadmin.'))
       return
     }
 
@@ -103,11 +103,11 @@ export const TenantsManagement: React.FC = () => {
 
       // Afficher un message d'erreur spécifique selon le type d'erreur
       if (error.response?.status === 403) {
-        addToast('Accès refusé. Vous devez être superadmin pour gérer les tenants.', 'error')
+        addToast(createErrorToast('Accès refusé. Vous devez être superadmin pour gérer les tenants.'))
       } else if (error.response?.status === 401) {
-        addToast('Session expirée. Veuillez vous reconnecter.', 'error')
+        addToast(createErrorToast('Session expirée. Veuillez vous reconnecter.'))
       } else {
-        addToast('Erreur lors du chargement des tenants. Vérifiez votre connexion.', 'error')
+        addToast(createErrorToast('Erreur lors du chargement des tenants. Vérifiez votre connexion.'))
       }
 
       // Ne pas utiliser les données mock en production, laisser la liste vide
@@ -159,11 +159,11 @@ export const TenantsManagement: React.FC = () => {
           ? { ...tenant, isActive: !tenant.isActive }
           : tenant
       ))
-      addToast('Statut du tenant mis à jour avec succès', 'success')
+      addToast(createSuccessToast('Statut du tenant mis à jour avec succès'))
     } catch (error) {
       console.error('Erreur lors de la mise à jour du statut:', error)
       console.error('Détails de l\'erreur:', error.response?.data || error.message)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     }
   }
 
@@ -185,7 +185,7 @@ export const TenantsManagement: React.FC = () => {
 
       // Mettre à jour l'état local seulement si la suppression a réussi
       setTenants(prev => prev.filter(tenant => tenant.id !== tenantId))
-      addToast(`Tenant "${tenantName}" supprimé avec succès`, 'success')
+      addToast(createSuccessToast(`Tenant "${tenantName}" supprimé avec succès`))
 
     } catch (error: any) {
       console.error('❌ Erreur lors de la suppression du tenant:', error)
@@ -211,7 +211,7 @@ export const TenantsManagement: React.FC = () => {
         errorMessage = handleApiError(error)
       }
 
-      addToast(errorMessage, 'error')
+      addToast(createErrorToast(errorMessage))
     }
   }
 
@@ -231,7 +231,7 @@ export const TenantsManagement: React.FC = () => {
     ))
     setShowEditForm(false)
     setSelectedTenant(null)
-    addToast('Tenant mis à jour avec succès', 'success')
+    addToast(createSuccessToast('Tenant mis à jour avec succès'))
   }
 
   // Fonction de test pour diagnostiquer l'API
@@ -262,19 +262,19 @@ export const TenantsManagement: React.FC = () => {
         if (authResponse.ok) {
           const tenantsData = await authResponse.json()
           console.log('Données tenants reçues:', tenantsData)
-          addToast('Test API réussi !', 'success')
+          addToast(createSuccessToast('Test API réussi !'))
         } else {
           const errorData = await authResponse.json()
           console.error('Erreur API tenants:', errorData)
-          addToast(`Erreur API: ${errorData.error || 'Erreur inconnue'}`, 'error')
+          addToast(createErrorToast(`Erreur API: ${errorData.error || 'Erreur inconnue'}`))
         }
       } else {
-        addToast('Aucun token d\'authentification trouvé', 'error')
+        addToast(createErrorToast('Aucun token d\'authentification trouvé'))
       }
 
     } catch (error) {
       console.error('Erreur lors du test API:', error)
-      addToast('Erreur de connexion au serveur', 'error')
+      addToast(createErrorToast('Erreur de connexion au serveur'))
     }
   }
 
@@ -613,7 +613,7 @@ export const TenantsManagement: React.FC = () => {
           onSuccess={(newTenant) => {
             setTenants(prev => [...prev, newTenant])
             setShowCreateForm(false)
-            addToast('Tenant créé avec succès', 'success')
+            addToast(createSuccessToast('Tenant créé avec succès'))
           }}
         />
       )}
@@ -698,7 +698,7 @@ const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
       onSuccess(newTenant)
     } catch (error) {
       console.error('Erreur lors de la création du tenant:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     } finally {
       setIsSubmitting(false)
     }
@@ -1037,7 +1037,7 @@ const EditTenantModal: React.FC<EditTenantModalProps> = ({
       onSuccess(updatedTenant)
     } catch (error) {
       console.error('Erreur lors de la mise à jour du tenant:', error)
-      addToast(handleApiError(error), 'error')
+      addToast(createErrorToast(handleApiError(error)))
     } finally {
       setIsSubmitting(false)
     }

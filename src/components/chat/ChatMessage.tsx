@@ -26,7 +26,7 @@ interface ChatMessageProps {
 // Improved markdown parser
 const parseMarkdown = (text: string) => {
   const lines = text.split('\n')
-  const elements: JSX.Element[] = []
+  const elements: React.ReactElement[] = []
   let currentIndex = 0
 
   lines.forEach((line, index) => {

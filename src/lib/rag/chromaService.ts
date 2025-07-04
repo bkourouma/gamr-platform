@@ -1,4 +1,4 @@
-import { EmbeddingDocument, VectorSearchResult } from './types'
+import type { EmbeddingDocument, VectorSearchResult } from './types'
 
 // Mock ChromaDB service for development
 export class ChromaService {

@@ -1,6 +1,6 @@
 import { ChromaService } from './chromaService'
 import { DataExtractor } from './dataExtractor'
-import { RAGQuery, RAGResponse, DocumentSource } from './types'
+import type { RAGQuery, RAGResponse, DocumentSource } from './types'
 
 export class RAGService {
   private chromaService: ChromaService

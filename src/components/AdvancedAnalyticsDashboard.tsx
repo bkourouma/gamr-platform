@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/Card'
 import { Button } from './ui/Button'
-import { api } from "../lib/api";
+import { apiClient } from "../lib/api";
+import type {
+  AnalyticsDashboardData,
+  PredictiveInsight,
+  AnomalyData,
+  CorrelationInsight,
+  EnhancedAnalyticsData
+} from "../types/analytics"
 import { TrendChart } from './analytics/TrendChart'
 import { RiskDistributionChart } from './analytics/RiskDistributionChart'
 import { SectorAnalyticsChart } from './analytics/SectorAnalyticsChart'
@@ -54,22 +61,22 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
   const loadAnalytics = async () => {
     try {
       setLoading(true)
-      const timeRange = AnalyticsService.getTimeRanges()[selectedTimeRange]
-      
+
+      // Use API calls instead of direct service imports
       const [analyticsData, predictiveInsights, anomalies, correlationData] = await Promise.all([
-        AnalyticsService.getDashboardAnalytics(tenantId, timeRange),
-        EnhancedAnalyticsService.generatePredictiveInsights(tenantId, timeRange),
-        EnhancedAnalyticsService.detectAnomalies(tenantId, timeRange),
-        EnhancedAnalyticsService.calculateCorrelationMatrix(tenantId, timeRange)
+        apiClient.get(`/analytics/dashboard/${tenantId}?timeRange=${selectedTimeRange}`),
+        apiClient.get(`/analytics/predictive/${tenantId}?timeRange=${selectedTimeRange}`),
+        apiClient.get(`/analytics/anomalies/${tenantId}?timeRange=${selectedTimeRange}`),
+        apiClient.get(`/analytics/correlations/${tenantId}?timeRange=${selectedTimeRange}`)
       ])
       
       setData(analyticsData)
       setEnhancedData({
-        predictiveInsights,
-        anomalies,
+        predictiveInsights: predictiveInsights,
+        anomalies: anomalies,
         objectivePerformance: [],
-        correlationMatrix: correlationData.matrix,
-        correlationLabels: correlationData.labels,
+        correlationMatrix: correlationData.matrix || [],
+        correlationLabels: correlationData.labels || [],
         aiInsights: {
           summary: 'Analyse des données avec insights IA avancés',
           keyFindings: [
@@ -82,7 +89,7 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
             'Analyser les tendances',
             'Mettre à jour les mesures'
           ],
-          riskTrends: predictiveInsights.map((i: any) => i.metric + ': ' + i.trend)
+          riskTrends: (predictiveInsights.data || predictiveInsights).map((i: any) => i.metric + ': ' + i.trend)
         }
       })
     } catch (error) {

@@ -8,6 +8,7 @@ declare global {
     interface Request {
       user?: {
         id: string
+        userId: string
         email: string
         firstName: string
         lastName: string
@@ -59,6 +60,7 @@ export const authMiddleware = async (req: any, res: any, next: any) => {
       // Ajouter l'utilisateur à la requête
       req.user = {
         id: user.id,
+        userId: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,

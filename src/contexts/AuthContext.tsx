@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { authApi, handleApiError, apiClient } from '../lib/api'
 import type { User, AuthContextType } from '../types/auth'
 
@@ -61,7 +61,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem('gamr_user', JSON.stringify(result.user))
         localStorage.setItem('gamr_token', result.token)
 
-        setUser(result.user)
+        // Convert API user to frontend user format
+        const frontendUser = {
+          ...result.user,
+          lastLogin: result.user.lastLogin ? new Date(result.user.lastLogin) : undefined,
+          tenant: {
+            ...result.user.tenant,
+            domain: result.user.tenant.slug, // Map slug to domain for compatibility
+            industry: '', // Default value since sector doesn't exist in API response
+            country: '', // Default value since location doesn't exist in API response
+            isActive: result.user.tenant.isActive ?? true
+          }
+        }
+        setUser(frontendUser)
         return { success: true }
       } else {
         return { success: false, error: 'Échec de la connexion' }

@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { api } from "../../lib/api";
+import type { RiskDistribution } from "../../types/analytics"
 import { Button } from "../ui/Button"
 import { PieChart as PieIcon, BarChart3 } from "lucide-react"
 

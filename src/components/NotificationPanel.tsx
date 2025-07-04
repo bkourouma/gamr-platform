@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Bell, X, Check, AlertTriangle, Clock, Shield, Zap, Settings } from 'lucide-react'
 import { Button } from './ui/Button'
 import { notificationsApi, type Notification } from '../lib/api'
-import { useToast } from './Toast'
+import { useToast, createSuccessToast, createErrorToast } from './Toast'
 
 interface NotificationPanelProps {
   isOpen: boolean
@@ -14,7 +14,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
   const [loading, setLoading] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const panelRef = useRef<HTMLDivElement>(null)
-  const { showToast } = useToast()
+  const { addToast } = useToast()
 
   // Fermer le panel en cliquant à l'extérieur
   useEffect(() => {
@@ -39,7 +39,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
       setNotifications(response.data)
     } catch (error) {
       console.error('Erreur lors du chargement des notifications:', error)
-      showToast('Erreur lors du chargement des notifications', 'error')
+      addToast(createErrorToast('Erreur lors du chargement des notifications'))
     } finally {
       setLoading(false)
     }
@@ -67,7 +67,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
       setUnreadCount(prev => Math.max(0, prev - 1))
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error)
-      showToast('Erreur lors de la mise à jour', 'error')
+      addToast(createErrorToast('Erreur lors de la mise à jour'))
     }
   }
 
@@ -79,10 +79,10 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, on
         prev.map(notif => ({ ...notif, isRead: true, readAt: new Date() }))
       )
       setUnreadCount(0)
-      showToast('Toutes les notifications ont été marquées comme lues', 'success')
+      addToast(createSuccessToast('Toutes les notifications ont été marquées comme lues'))
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error)
-      showToast('Erreur lors de la mise à jour', 'error')
+      addToast(createErrorToast('Erreur lors de la mise à jour'))
     }
   }
 

@@ -1,4 +1,4 @@
-import { SecurityObjective, SecurityQuestion } from '../data/securityQuestionnaire'
+import type { SecurityObjective, SecurityQuestion } from '../data/securityQuestionnaire'
 
 export interface GAMRScore {
   totalScore: number

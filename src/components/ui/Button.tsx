@@ -2,7 +2,7 @@ import React from 'react'
 import { cn } from '../../lib/utils'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'success' | 'warning' | 'gradient'
+  variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'success' | 'warning' | 'gradient' | 'ghost' | 'default'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   children: React.ReactNode
   loading?: boolean
@@ -61,6 +61,16 @@ export const Button: React.FC<ButtonProps> = ({
       bg-gradient-to-r from-primary-500 via-accent-500 to-primary-600 text-white
       hover:from-primary-600 hover:via-accent-600 hover:to-primary-700
       focus-visible:ring-accent-500 shadow-glow hover:shadow-glow-accent
+    `,
+    ghost: `
+      bg-transparent text-gray-600 border-none
+      hover:bg-gray-100 hover:text-gray-900
+      focus-visible:ring-gray-500
+    `,
+    default: `
+      bg-gray-100 text-gray-700 border border-gray-200
+      hover:bg-gray-200 hover:border-gray-300
+      focus-visible:ring-gray-500 shadow-soft
     `
   }
 
