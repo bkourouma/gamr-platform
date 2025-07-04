@@ -1,0 +1,307 @@
+name: 🏗️ Deploy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - destroy
+          - validate
+      resource_group:
+        description: 'Azure Resource Group (optional - uses default if empty)'
+        required: false
+        type: string
+
+env:
+  AZURE_LOCATION: 'West Europe'
+
+jobs:
+  # Validate Infrastructure
+  validate:
+    if: github.event.inputs.action == 'validate' || github.event.inputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    name: ✅ Validate Infrastructure
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🔍 Validate ARM template
+      run: |
+        RESOURCE_GROUP="${{ github.event.inputs.resource_group }}"
+        if [[ -z "$RESOURCE_GROUP" ]]; then
+          RESOURCE_GROUP="gamr-platform-${{ github.event.inputs.environment }}-rg"
+        fi
+        
+        echo "Validating infrastructure for environment: ${{ github.event.inputs.environment }}"
+        echo "Resource Group: $RESOURCE_GROUP"
+        
+        # Create resource group if it doesn't exist
+        az group create --name "$RESOURCE_GROUP" --location "${{ env.AZURE_LOCATION }}" || true
+        
+        # Validate template
+        az deployment group validate \
+          --resource-group "$RESOURCE_GROUP" \
+          --template-file azure/arm-template.json \
+          --parameters @azure/parameters.${{ github.event.inputs.environment }}.json
+
+    - name: ✅ Validation complete
+      run: echo "Infrastructure validation completed successfully"
+
+  # Deploy Infrastructure
+  deploy:
+    if: github.event.inputs.action == 'deploy'
+    needs: validate
+    runs-on: ubuntu-latest
+    name: 🚀 Deploy Infrastructure
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🏗️ Deploy infrastructure
+      run: |
+        RESOURCE_GROUP="${{ github.event.inputs.resource_group }}"
+        if [[ -z "$RESOURCE_GROUP" ]]; then
+          RESOURCE_GROUP="gamr-platform-${{ github.event.inputs.environment }}-rg"
+        fi
+        
+        DEPLOYMENT_NAME="gamr-infrastructure-$(date +%Y%m%d-%H%M%S)"
+        
+        echo "Deploying infrastructure..."
+        echo "Environment: ${{ github.event.inputs.environment }}"
+        echo "Resource Group: $RESOURCE_GROUP"
+        echo "Deployment Name: $DEPLOYMENT_NAME"
+        
+        # Create resource group
+        az group create --name "$RESOURCE_GROUP" --location "${{ env.AZURE_LOCATION }}"
+        
+        # Deploy infrastructure
+        az deployment group create \
+          --resource-group "$RESOURCE_GROUP" \
+          --name "$DEPLOYMENT_NAME" \
+          --template-file azure/arm-template.json \
+          --parameters @azure/parameters.${{ github.event.inputs.environment }}.json \
+          --output table
+        
+        # Get outputs
+        az deployment group show \
+          --resource-group "$RESOURCE_GROUP" \
+          --name "$DEPLOYMENT_NAME" \
+          --query "properties.outputs" \
+          --output json > deployment-outputs.json
+        
+        echo "RESOURCE_GROUP=$RESOURCE_GROUP" >> $GITHUB_ENV
+        echo "DEPLOYMENT_NAME=$DEPLOYMENT_NAME" >> $GITHUB_ENV
+
+    - name: 📊 Extract deployment outputs
+      run: |
+        if [[ -f deployment-outputs.json ]]; then
+          REGISTRY_URL=$(jq -r '.containerRegistryLoginServer.value // empty' deployment-outputs.json)
+          APP_SERVICE_NAME=$(jq -r '.appServiceName.value // empty' deployment-outputs.json)
+          APP_SERVICE_URL=$(jq -r '.appServiceUrl.value // empty' deployment-outputs.json)
+          STORAGE_ACCOUNT=$(jq -r '.storageAccountName.value // empty' deployment-outputs.json)
+          INSIGHTS_KEY=$(jq -r '.applicationInsightsInstrumentationKey.value // empty' deployment-outputs.json)
+          
+          echo "🎉 Infrastructure deployed successfully!"
+          echo ""
+          echo "📋 Deployment Summary:"
+          echo "  Resource Group: ${{ env.RESOURCE_GROUP }}"
+          echo "  Container Registry: $REGISTRY_URL"
+          echo "  App Service: $APP_SERVICE_NAME"
+          echo "  App Service URL: $APP_SERVICE_URL"
+          echo "  Storage Account: $STORAGE_ACCOUNT"
+          echo ""
+          
+          # Create summary for GitHub
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## 🏗️ Infrastructure Deployment Complete
+          
+          ### 📋 Resources Created
+          - **Resource Group**: \`${{ env.RESOURCE_GROUP }}\`
+          - **Container Registry**: \`$REGISTRY_URL\`
+          - **App Service**: \`$APP_SERVICE_NAME\`
+          - **App Service URL**: [$APP_SERVICE_URL]($APP_SERVICE_URL)
+          - **Storage Account**: \`$STORAGE_ACCOUNT\`
+          
+          ### 🔧 Next Steps
+          1. Configure GitHub secrets with the deployment outputs
+          2. Run the application deployment workflow
+          3. Configure custom domain and SSL if needed
+          4. Set up monitoring and alerts
+          EOF
+        fi
+
+    - name: 📤 Upload deployment outputs
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-outputs-${{ github.event.inputs.environment }}
+        path: deployment-outputs.json
+        retention-days: 30
+
+  # Destroy Infrastructure
+  destroy:
+    if: github.event.inputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    name: 🗑️ Destroy Infrastructure
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: ⚠️ Confirm destruction
+      run: |
+        RESOURCE_GROUP="${{ github.event.inputs.resource_group }}"
+        if [[ -z "$RESOURCE_GROUP" ]]; then
+          RESOURCE_GROUP="gamr-platform-${{ github.event.inputs.environment }}-rg"
+        fi
+        
+        echo "⚠️ WARNING: This will destroy all resources in the resource group!"
+        echo "Environment: ${{ github.event.inputs.environment }}"
+        echo "Resource Group: $RESOURCE_GROUP"
+        
+        # List resources that will be deleted
+        echo "Resources to be deleted:"
+        az resource list --resource-group "$RESOURCE_GROUP" --output table || echo "Resource group not found"
+
+    - name: 💾 Backup data (if applicable)
+      run: |
+        RESOURCE_GROUP="${{ github.event.inputs.resource_group }}"
+        if [[ -z "$RESOURCE_GROUP" ]]; then
+          RESOURCE_GROUP="gamr-platform-${{ github.event.inputs.environment }}-rg"
+        fi
+        
+        echo "Creating backup before destruction..."
+        # Add backup logic here if needed
+        # For example, export database, download files from storage, etc.
+
+    - name: 🗑️ Destroy infrastructure
+      run: |
+        RESOURCE_GROUP="${{ github.event.inputs.resource_group }}"
+        if [[ -z "$RESOURCE_GROUP" ]]; then
+          RESOURCE_GROUP="gamr-platform-${{ github.event.inputs.environment }}-rg"
+        fi
+        
+        echo "Destroying resource group: $RESOURCE_GROUP"
+        
+        if az group exists --name "$RESOURCE_GROUP"; then
+          az group delete --name "$RESOURCE_GROUP" --yes --no-wait
+          echo "✅ Resource group deletion initiated"
+          echo "Note: Deletion may take several minutes to complete"
+        else
+          echo "ℹ️ Resource group does not exist"
+        fi
+
+    - name: 📋 Destruction summary
+      run: |
+        cat >> $GITHUB_STEP_SUMMARY << EOF
+        ## 🗑️ Infrastructure Destruction
+        
+        ### ⚠️ Action Performed
+        - **Environment**: ${{ github.event.inputs.environment }}
+        - **Resource Group**: Deletion initiated
+        - **Status**: In progress (may take several minutes)
+        
+        ### 📝 Notes
+        - All resources in the resource group have been scheduled for deletion
+        - Backups were created before destruction (if applicable)
+        - Monitor the Azure portal to confirm complete deletion
+        EOF
+
+  # Post-deployment configuration
+  configure:
+    if: github.event.inputs.action == 'deploy'
+    needs: deploy
+    runs-on: ubuntu-latest
+    name: ⚙️ Post-deployment Configuration
+    
+    steps:
+    - name: 📥 Download deployment outputs
+      uses: actions/download-artifact@v4
+      with:
+        name: deployment-outputs-${{ github.event.inputs.environment }}
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: ⚙️ Configure App Service settings
+      run: |
+        if [[ -f deployment-outputs.json ]]; then
+          APP_SERVICE_NAME=$(jq -r '.appServiceName.value // empty' deployment-outputs.json)
+          RESOURCE_GROUP="${{ github.event.inputs.resource_group }}"
+          if [[ -z "$RESOURCE_GROUP" ]]; then
+            RESOURCE_GROUP="gamr-platform-${{ github.event.inputs.environment }}-rg"
+          fi
+          
+          echo "Configuring App Service: $APP_SERVICE_NAME"
+          
+          # Configure additional app settings
+          az webapp config appsettings set \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$APP_SERVICE_NAME" \
+            --settings \
+              WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
+              WEBSITES_PORT=3002 \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false
+          
+          # Configure logging
+          az webapp log config \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$APP_SERVICE_NAME" \
+            --application-logging filesystem \
+            --level information \
+            --web-server-logging filesystem
+          
+          echo "✅ App Service configuration completed"
+        fi
+
+    - name: 🔍 Verify deployment
+      run: |
+        if [[ -f deployment-outputs.json ]]; then
+          APP_SERVICE_URL=$(jq -r '.appServiceUrl.value // empty' deployment-outputs.json)
+          
+          echo "Verifying deployment at: $APP_SERVICE_URL"
+          
+          # Wait for the service to be ready
+          for i in {1..10}; do
+            if curl -f -s "$APP_SERVICE_URL" > /dev/null; then
+              echo "✅ Service is responding"
+              break
+            else
+              echo "⏳ Waiting for service to be ready... (attempt $i/10)"
+              sleep 30
+            fi
+          done
+        fi

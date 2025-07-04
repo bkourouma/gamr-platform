@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  gamr-app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: gamr-platform-dev
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+      - "5173:5173"  # Vite dev server
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - JWT_SECRET=dev-secret-key
+      - JWT_EXPIRES_IN=7d
+      - FRONTEND_URL=http://localhost:5173
+      - CORS_ORIGIN=http://localhost:5173
+      - VITE_API_URL=http://localhost:3002
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./vite.config.ts:/app/vite.config.ts
+      - ./tailwind.config.js:/app/tailwind.config.js
+      # Persistent database
+      - dev-db:/app/prisma
+      # Node modules (avoid conflicts)
+      - /app/node_modules
+    networks:
+      - gamr-dev-network
+    command: npm run dev:full
+
+  # Optional: PostgreSQL for development
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: gamr-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=gamr_dev
+      - POSTGRES_USER=gamr
+      - POSTGRES_PASSWORD=dev_password
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    networks:
+      - gamr-dev-network
+    profiles:
+      - postgres
+
+  # Optional: Redis for caching (future use)
+  redis-dev:
+    image: redis:7-alpine
+    container_name: gamr-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-dev-data:/data
+    networks:
+      - gamr-dev-network
+    profiles:
+      - redis
+
+volumes:
+  dev-db:
+    driver: local
+  postgres-dev-data:
+    driver: local
+  redis-dev-data:
+    driver: local
+
+networks:
+  gamr-dev-network:
+    driver: bridge

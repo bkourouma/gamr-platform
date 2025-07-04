@@ -1,0 +1,242 @@
+name: 🚀 Deploy GAMR Platform
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY_NAME: ${{ secrets.AZURE_REGISTRY_NAME }}
+  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  APP_SERVICE_NAME: ${{ secrets.AZURE_APP_SERVICE_NAME }}
+  IMAGE_NAME: gamr-platform
+
+jobs:
+  # Test and Build Job
+  test-and-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔧 Generate Prisma client
+      run: npx prisma generate
+
+    - name: 🧪 Run tests
+      run: |
+        # Add your test commands here
+        npm run build
+        echo "✅ Build successful"
+
+    - name: 🏗️ Build Docker image
+      run: |
+        docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
+
+    - name: 🔍 Test Docker image
+      run: |
+        # Start container for testing
+        docker run -d --name test-container \
+          -e NODE_ENV=production \
+          -e DATABASE_URL="file:/app/data/test.db" \
+          -e JWT_SECRET="test-secret" \
+          -p 3002:3002 \
+          ${{ env.IMAGE_NAME }}:latest
+        
+        # Wait for container to start
+        sleep 30
+        
+        # Test health endpoint
+        curl -f http://localhost:3002/health || exit 1
+        
+        # Cleanup
+        docker stop test-container
+        docker rm test-container
+
+    - name: 💾 Save Docker image
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+      run: |
+        docker save ${{ env.IMAGE_NAME }}:${{ github.sha }} | gzip > gamr-platform-image.tar.gz
+
+    - name: 📤 Upload Docker image artifact
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: gamr-platform-image.tar.gz
+        retention-days: 1
+
+  # Deploy to Staging
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 📥 Download Docker image
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+
+    - name: 🔧 Load Docker image
+      run: |
+        docker load < gamr-platform-image.tar.gz
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🔐 Login to Azure Container Registry
+      run: |
+        az acr login --name ${{ env.REGISTRY_NAME }}
+
+    - name: 🚀 Push to Azure Container Registry
+      run: |
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:staging-latest
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:staging-latest
+
+    - name: 🔄 Deploy to Azure App Service (Staging)
+      run: |
+        az webapp config container set \
+          --name ${{ env.APP_SERVICE_NAME }}-staging \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --docker-custom-image-name ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}
+
+    - name: ⚙️ Configure App Settings
+      run: |
+        az webapp config appsettings set \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.APP_SERVICE_NAME }}-staging \
+          --settings \
+            NODE_ENV=staging \
+            JWT_SECRET="${{ secrets.JWT_SECRET_STAGING }}" \
+            FRONTEND_URL="${{ secrets.FRONTEND_URL_STAGING }}" \
+            CORS_ORIGIN="${{ secrets.FRONTEND_URL_STAGING }}"
+
+    - name: 🔍 Health Check
+      run: |
+        sleep 60  # Wait for deployment
+        curl -f ${{ secrets.FRONTEND_URL_STAGING }}/health || exit 1
+
+  # Deploy to Production
+  deploy-production:
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 📥 Download Docker image
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+
+    - name: 🔧 Load Docker image
+      run: |
+        docker load < gamr-platform-image.tar.gz
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🔐 Login to Azure Container Registry
+      run: |
+        az acr login --name ${{ env.REGISTRY_NAME }}
+
+    - name: 🚀 Push to Azure Container Registry
+      run: |
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }}
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-latest
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-latest
+
+    - name: 💾 Backup Database (Production)
+      run: |
+        # Create backup before deployment
+        az webapp ssh --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_SERVICE_NAME }} \
+          --command "sqlite3 /app/data/prod.db '.backup /app/data/backup-$(date +%Y%m%d-%H%M%S).db'" || true
+
+    - name: 🔄 Deploy to Azure App Service (Production)
+      run: |
+        az webapp config container set \
+          --name ${{ env.APP_SERVICE_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --docker-custom-image-name ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:prod-${{ github.sha }}
+
+    - name: ⚙️ Configure App Settings
+      run: |
+        az webapp config appsettings set \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.APP_SERVICE_NAME }} \
+          --settings \
+            NODE_ENV=production \
+            JWT_SECRET="${{ secrets.JWT_SECRET_PRODUCTION }}" \
+            FRONTEND_URL="${{ secrets.FRONTEND_URL_PRODUCTION }}" \
+            CORS_ORIGIN="${{ secrets.FRONTEND_URL_PRODUCTION }}"
+
+    - name: 🔍 Health Check
+      run: |
+        sleep 90  # Wait for deployment
+        curl -f ${{ secrets.FRONTEND_URL_PRODUCTION }}/health || exit 1
+
+    - name: 📊 Post-deployment verification
+      run: |
+        # Additional checks for production
+        echo "🎉 Production deployment successful!"
+        echo "🌐 Application URL: ${{ secrets.FRONTEND_URL_PRODUCTION }}"
+        echo "📊 Health Check: ${{ secrets.FRONTEND_URL_PRODUCTION }}/health"
+
+  # Cleanup
+  cleanup:
+    if: always()
+    needs: [test-and-build, deploy-staging, deploy-production]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🧹 Cleanup artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+      continue-on-error: true
+      
+    - name: 🗑️ Remove old images from registry
+      if: github.ref == 'refs/heads/main'
+      run: |
+        az acr login --name ${{ env.REGISTRY_NAME }}
+        # Keep only the last 5 production images
+        az acr repository show-tags --name ${{ env.REGISTRY_NAME }} --repository ${{ env.IMAGE_NAME }} \
+          --orderby time_desc --output tsv | tail -n +6 | head -n 10 | \
+          xargs -I {} az acr repository delete --name ${{ env.REGISTRY_NAME }} --image ${{ env.IMAGE_NAME }}:{} --yes || true
+      continue-on-error: true

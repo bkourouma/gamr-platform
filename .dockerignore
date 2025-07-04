@@ -1,0 +1,91 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production build (will be built inside container)
+dist
+
+# Development files
+.env.local
+.env.development
+.env.test
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Test files
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+coverage/
+
+# Development database
+prisma/dev.db
+prisma/dev.db-journal
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Scripts and utilities (not needed in production)
+scripts/
+test-*.js
+test-*.cjs
+*.cjs
+check-*.cjs
+create-*.cjs
+fix-*.cjs
+quick-*.cjs
+
+# Deployment files
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Azure and CI/CD files
+.github/
+azure/
+deployment/

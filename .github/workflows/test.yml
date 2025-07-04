@@ -1,0 +1,271 @@
+name: 🧪 Test GAMR Platform
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Lint and Format Check
+  lint:
+    runs-on: ubuntu-latest
+    name: 🔍 Lint & Format Check
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔍 Run ESLint
+      run: npm run lint
+
+    - name: 💅 Check Prettier formatting
+      run: npm run format:check
+
+    - name: 🎨 Check TypeScript
+      run: npm run type-check
+
+  # Unit Tests
+  unit-tests:
+    runs-on: ubuntu-latest
+    name: 🧪 Unit Tests
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔧 Generate Prisma client
+      run: npx prisma generate
+
+    - name: 🧪 Run unit tests
+      run: npm run test:unit
+      env:
+        DATABASE_URL: "file:./test.db"
+        JWT_SECRET: "test-secret"
+
+    - name: 📊 Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+      continue-on-error: true
+
+  # Integration Tests
+  integration-tests:
+    runs-on: ubuntu-latest
+    name: 🔗 Integration Tests
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: gamr_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔧 Generate Prisma client
+      run: npx prisma generate
+
+    - name: 🗄️ Run database migrations
+      run: npx prisma migrate deploy
+      env:
+        DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/gamr_test"
+
+    - name: 🌱 Seed test database
+      run: npx prisma db seed
+      env:
+        DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/gamr_test"
+
+    - name: 🔗 Run integration tests
+      run: npm run test:integration
+      env:
+        DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/gamr_test"
+        JWT_SECRET: "test-secret"
+        NODE_ENV: "test"
+
+  # End-to-End Tests
+  e2e-tests:
+    runs-on: ubuntu-latest
+    name: 🎭 E2E Tests
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔧 Generate Prisma client
+      run: npx prisma generate
+
+    - name: 🏗️ Build application
+      run: npm run build
+
+    - name: 🚀 Start application
+      run: |
+        npm run start &
+        sleep 30
+      env:
+        DATABASE_URL: "file:./e2e-test.db"
+        JWT_SECRET: "e2e-test-secret"
+        NODE_ENV: "test"
+        PORT: 3002
+
+    - name: 🎭 Run Playwright tests
+      run: npx playwright test
+      env:
+        BASE_URL: "http://localhost:3002"
+
+    - name: 📸 Upload test results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  # Security Scan
+  security-scan:
+    runs-on: ubuntu-latest
+    name: 🔒 Security Scan
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔒 Run npm audit
+      run: npm audit --audit-level high
+
+    - name: 🛡️ Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+      continue-on-error: true
+
+  # Build Test
+  build-test:
+    runs-on: ubuntu-latest
+    name: 🏗️ Build Test
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔧 Generate Prisma client
+      run: npx prisma generate
+
+    - name: 🏗️ Build frontend
+      run: npm run build:frontend
+
+    - name: 🏗️ Build backend
+      run: npm run build:server
+
+    - name: 🐳 Test Docker build
+      run: |
+        docker build -t gamr-platform:test .
+        docker run --rm -d --name gamr-test \
+          -e NODE_ENV=production \
+          -e DATABASE_URL="file:/app/data/test.db" \
+          -e JWT_SECRET="test-secret" \
+          -p 3003:3002 \
+          gamr-platform:test
+        sleep 30
+        curl -f http://localhost:3003/health || exit 1
+        docker stop gamr-test
+
+  # Test Summary
+  test-summary:
+    if: always()
+    needs: [lint, unit-tests, integration-tests, e2e-tests, security-scan, build-test]
+    runs-on: ubuntu-latest
+    name: 📋 Test Summary
+    
+    steps:
+    - name: 📊 Check test results
+      run: |
+        echo "Test Results Summary:"
+        echo "Lint: ${{ needs.lint.result }}"
+        echo "Unit Tests: ${{ needs.unit-tests.result }}"
+        echo "Integration Tests: ${{ needs.integration-tests.result }}"
+        echo "E2E Tests: ${{ needs.e2e-tests.result }}"
+        echo "Security Scan: ${{ needs.security-scan.result }}"
+        echo "Build Test: ${{ needs.build-test.result }}"
+        
+        if [[ "${{ needs.lint.result }}" == "failure" || 
+              "${{ needs.unit-tests.result }}" == "failure" || 
+              "${{ needs.integration-tests.result }}" == "failure" || 
+              "${{ needs.e2e-tests.result }}" == "failure" || 
+              "${{ needs.build-test.result }}" == "failure" ]]; then
+          echo "❌ Some tests failed"
+          exit 1
+        else
+          echo "✅ All tests passed"
+        fi

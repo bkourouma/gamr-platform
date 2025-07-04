@@ -1,0 +1,469 @@
+// Schéma Prisma pour la plateforme GAMR intelligente
+// Gestion multi-tenant avec isolation des données
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ===== GESTION DES ORGANISATIONS (TENANTS) =====
+
+model Tenant {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logo        String?
+  description String?
+
+  // Profil métier intelligent pour l'IA
+  sector      String?  // Secteur d'activité
+  size        String?  // Taille de l'entreprise (TPE, PME, ETI, GE)
+  location    String?  // Géolocalisation
+
+  // Paramètres personnalisés
+  riskLevels     Json?    // Niveaux de gravité personnalisés
+  threatTypes    Json?    // Types de menaces spécifiques
+  reviewFrequency Int?    // Fréquence de révision en jours
+
+  // Métadonnées
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       User[]
+  riskSheets  RiskSheet[]
+  actions     Action[]
+  evaluationTemplates EvaluationTemplate[]
+  evaluations Evaluation[]
+
+  @@map("tenants")
+}
+
+// ===== GESTION DES UTILISATEURS =====
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  password  String   // Hash du mot de passe
+
+  // Rôles par tenant
+  role      UserRole @default(READER)
+
+  // Métadonnées
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenantId     String
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  riskSheets   RiskSheet[]
+  actions      Action[]
+  auditLogs    AuditLog[]
+  evaluations  Evaluation[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN    // Administrateur global (cross-tenant)
+  ADMIN          // Administrateur local du tenant
+  AI_ANALYST     // Analyste IA (configure les modèles prédictifs)
+  EVALUATOR      // Évaluateur (crée et met à jour des fiches)
+  READER         // Lecteur (accès en lecture seule)
+}
+
+// ===== FICHES D'ANALYSE GAMR =====
+
+model RiskSheet {
+  id          String   @id @default(cuid())
+
+  // Champs GAMR principaux
+  target      String   // Cible potentielle
+  scenario    String   // Scénario de menace
+  probability Int      // Probabilité (1-3)
+  vulnerability Int    // Vulnérabilité (1-4)
+  impact      Int      // Répercussions (1-5)
+
+  // Calculs automatiques
+  riskScore   Float    // Note de risque calculée
+  priority    Priority @default(MEDIUM)
+
+  // Classification intelligente (IA)
+  category    String?  // Catégorie automatique
+  tags        Json?    // Tags automatiques
+  aiSuggestions Json?  // Suggestions IA
+
+  // Métadonnées
+  version     Int      @default(1)
+  isArchived  Boolean  @default(false)
+  reviewDate  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  actions     Action[]
+  correlations RiskCorrelation[] @relation("SourceRisk")
+  correlatedBy RiskCorrelation[] @relation("TargetRisk")
+  sourceEvaluation Evaluation? @relation(fields: [sourceEvaluationId], references: [id])
+  sourceEvaluationId String?
+
+  @@map("risk_sheets")
+}
+
+enum Priority {
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ===== MATRICES DE CORRÉLATION =====
+
+model RiskCorrelation {
+  id              String  @id @default(cuid())
+
+  // Coefficient de corrélation (-1 à 1)
+  coefficient     Float
+  correlationType CorrelationType
+
+  // Métadonnées
+  isActive        Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  sourceRiskId    String
+  sourceRisk      RiskSheet @relation("SourceRisk", fields: [sourceRiskId], references: [id], onDelete: Cascade)
+  targetRiskId    String
+  targetRisk      RiskSheet @relation("TargetRisk", fields: [targetRiskId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceRiskId, targetRiskId])
+  @@map("risk_correlations")
+}
+
+enum CorrelationType {
+  CAUSAL         // Relation de cause à effet
+  CONDITIONAL    // Relation conditionnelle
+  TEMPORAL       // Relation temporelle
+  RESOURCE       // Partage de ressources
+  GEOGRAPHIC     // Proximité géographique
+}
+
+// ===== ACTIONS CORRECTIVES =====
+
+model Action {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+
+  // Planification
+  dueDate     DateTime?
+  status      ActionStatus @default(TODO)
+  priority    Priority    @default(MEDIUM)
+
+  // Prédictions IA
+  successProbability Float?  // Probabilité de réussite prédite
+  estimatedCost      Float?  // Coût estimé
+  estimatedDuration  Int?    // Durée estimée en jours
+
+  // Métadonnées
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+
+  // Relations
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  riskSheetId String
+  riskSheet   RiskSheet @relation(fields: [riskSheetId], references: [id], onDelete: Cascade)
+  assigneeId  String?
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+
+  @@map("actions")
+}
+
+enum ActionStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// ===== AUDIT ET TRAÇABILITÉ =====
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String   // Type d'action (CREATE, UPDATE, DELETE, etc.)
+  entity    String   // Entité concernée (RiskSheet, User, etc.)
+  entityId  String   // ID de l'entité
+  oldValues Json?    // Anciennes valeurs
+  newValues Json?    // Nouvelles valeurs
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+
+  // Relations
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ===== NOTIFICATIONS =====
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType
+
+  // État
+  isRead    Boolean @default(false)
+  isSent    Boolean @default(false)
+
+  // Métadonnées
+  createdAt DateTime @default(now())
+  readAt    DateTime?
+  sentAt    DateTime?
+
+  // Relations - Notification globale ou spécifique à un utilisateur
+  userId    String?
+  tenantId  String?
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  RISK_CRITICAL     // Risque critique détecté
+  ACTION_OVERDUE    // Action en retard
+  REVIEW_DUE        // Révision due
+  AI_ALERT          // Alerte IA
+  CORRELATION_ALERT // Alerte de corrélation
+  SYSTEM            // Notification système
+}
+
+// ===== QUESTIONNAIRES D'ÉVALUATION SÉCURITAIRE =====
+
+model EvaluationTemplate {
+  id          String   @id @default(cuid())
+  name        String   // "Évaluation Sécurité Standard"
+  description String?
+  version     String   @default("1.0")
+
+  // Configuration par secteur
+  targetSectors Json?  // ["Technologie", "Santé", "Finance"]
+  companySize   Json?  // ["TPE", "PME", "ETI", "GE"]
+
+  // Métadonnées
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tenantId       String
+  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  questionGroups QuestionGroup[]
+  evaluations    Evaluation[]
+
+  @@map("evaluation_templates")
+}
+
+model QuestionGroup {
+  id          String   @id @default(cuid())
+  title       String   // "Lignes de défenses"
+  description String?
+  orderIndex  Int      // Ordre d'affichage
+
+  // Configuration d'affichage
+  icon        String?  // Nom de l'icône Lucide
+  color       String?  // Couleur du groupe
+
+  // Relations
+  templateId  String
+  template    EvaluationTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  objectives  Objective[]
+
+  @@map("question_groups")
+}
+
+model Objective {
+  id          String   @id @default(cuid())
+  title       String   // "DIAGNOSTIQUE SECURITAIRE DE LA VOIE D'ACCES"
+  description String?
+  orderIndex  Int
+
+  // Pondération pour le scoring
+  weight      Float    @default(1.0)
+
+  // Relations
+  groupId     String
+  group       QuestionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  questions   Question[]
+
+  @@map("objectives")
+}
+
+model Question {
+  id          String      @id @default(cuid())
+  text        String      // "La voie d'accès à votre entreprise est-elle une voie publique ?"
+  type        QuestionType @default(YES_NO)
+  orderIndex  Int
+
+  // Configuration conditionnelle
+  isRequired  Boolean     @default(true)
+  dependsOn   Json?       // Conditions d'affichage
+
+  // Aide et contexte
+  helpText    String?     // Texte d'aide
+  placeholder String?     // Placeholder pour champs texte
+
+  // Pondération pour le scoring
+  weight      Float       @default(1.0)
+
+  // Relations
+  objectiveId String
+  objective   Objective   @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  responses   Response[]
+
+  @@map("questions")
+}
+
+model Evaluation {
+  id          String   @id @default(cuid())
+  title       String   // "Évaluation TechCorp - Janvier 2024"
+  status      EvaluationStatus @default(DRAFT)
+
+  // Métadonnées d'évaluation
+  startedAt   DateTime?
+  completedAt DateTime?
+  progress    Float    @default(0.0) // Pourcentage de completion
+
+  // Scoring global
+  totalScore  Float?   // Score final calculé
+  riskLevel   Priority? // Niveau de risque global
+
+  // Informations de l'entité évaluée
+  entityInfo  Json?    // Informations de base de l'entreprise
+
+  // Relations
+  templateId  String
+  template    EvaluationTemplate @relation(fields: [templateId], references: [id])
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  evaluatorId String
+  evaluator   User     @relation(fields: [evaluatorId], references: [id])
+  responses   Response[]
+  attachments MediaAttachment[]
+  generatedRisks RiskSheet[] // Fiches GAMR générées automatiquement
+
+  // Métadonnées
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("evaluations")
+}
+
+model Response {
+  id          String   @id @default(cuid())
+
+  // Réponse selon le type de question
+  booleanValue Boolean?
+  textValue    String?
+  numberValue  Float?
+  jsonValue    Json?    // Pour réponses complexes
+
+  // Évaluation de l'impact
+  facilityScore    Int?    // Score de facilité (réduction vulnérabilité)
+  constraintScore  Int?    // Score de contrainte (augmentation vulnérabilité)
+
+  // Commentaires et précisions
+  description String?  // Descriptions et précisions
+  comment     String?  // Commentaire de l'évaluateur
+
+  // Métadonnées
+  answeredAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  questionId   String
+  question     Question   @relation(fields: [questionId], references: [id])
+
+  @@unique([evaluationId, questionId])
+  @@map("responses")
+}
+
+model MediaAttachment {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int      // Taille en bytes
+
+  // Métadonnées du fichier
+  description String?
+  category    AttachmentCategory @default(PHOTO)
+
+  // Géolocalisation (pour photos terrain)
+  latitude    Float?
+  longitude   Float?
+
+  // Relations
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  questionId   String?   // Optionnel, pour lier à une question spécifique
+
+  // Métadonnées
+  uploadedAt  DateTime @default(now())
+
+  @@map("media_attachments")
+}
+
+// ===== ENUMS POUR QUESTIONNAIRES =====
+
+enum QuestionType {
+  YES_NO          // Question Oui/Non
+  TEXT            // Texte libre
+  NUMBER          // Nombre
+  SCALE           // Échelle (1-5)
+  MULTIPLE_CHOICE // Choix multiple
+  FILE_UPLOAD     // Upload de fichier
+  DATE            // Date
+  TIME            // Heure
+}
+
+enum EvaluationStatus {
+  DRAFT           // Brouillon
+  IN_PROGRESS     // En cours
+  COMPLETED       // Terminée
+  VALIDATED       // Validée
+  ARCHIVED        // Archivée
+}
+
+enum AttachmentCategory {
+  PHOTO           // Photo
+  DOCUMENT        // Document
+  VIDEO           // Vidéo
+  AUDIO           // Audio
+  PLAN            // Plan/Schéma
+  CERTIFICATE     // Certificat
+  OTHER           // Autre
+}

@@ -1,0 +1,48 @@
+# Development Dockerfile for GAMR Platform
+# Optimized for development with hot reload
+
+FROM node:18-alpine
+
+# Install system dependencies
+RUN apk add --no-cache python3 make g++ sqlite
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S gamr -u 1001
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY vite.config.ts ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci
+
+# Copy source code
+COPY src/ ./src/
+COPY public/ ./public/
+COPY prisma/ ./prisma/
+COPY index.html ./
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Create data directory and set permissions
+RUN mkdir -p /app/data && chown -R gamr:nodejs /app
+
+# Switch to non-root user
+USER gamr
+
+# Expose ports
+EXPOSE 3002 5173
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Default command (can be overridden)
+CMD ["npm", "run", "dev:full"]

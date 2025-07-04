@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for chat messages */
+.prose {
+  max-width: none;
+}
+
+.prose p {
+  margin-bottom: 0.75rem;
+}
+
+.prose h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
