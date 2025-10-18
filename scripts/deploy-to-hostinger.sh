@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script de déploiement GAMR Platform sur VPS Hostinger
+# Script de déploiement GAMR Platform sur un VPS Hostinger totalement neuf
 # Usage: ./deploy-to-hostinger.sh <ip-vps> <domaine>
 
 # Vérifier les arguments
@@ -14,6 +14,16 @@ DOMAIN=$2
 SSH_USER="root"
 APP_DIR="/opt/gamr"
 CURRENT_DIR=$(pwd)
+
+# Vérifier la connectivité SSH
+echo "🔍 Vérification de la connectivité SSH..."
+ssh -o "BatchMode=yes" -o "ConnectTimeout=5" $SSH_USER@$VPS_IP "echo SSH_CONNECTION_SUCCESSFUL" &>/dev/null
+if [ $? -eq 0 ]; then
+    echo "✅ Connexion SSH établie avec succès."
+else
+    echo "⚠️ Impossible d'établir une connexion SSH automatique."
+    echo "Vous devrez peut-être entrer le mot de passe lors des prochaines étapes."
+fi
 
 echo "🚀 Déploiement de GAMR Platform sur VPS Hostinger"
 echo "------------------------------------------------"
@@ -45,7 +55,17 @@ ssh $SSH_USER@$VPS_IP << EOF
     
     # Installer Docker
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \$(lsb_release -cs) stable"
+    # Déterminer la distribution et installer le repository approprié
+    DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+    RELEASE=$(lsb_release -cs)
+    if [ "$DISTRO" = "debian" ]; then
+        # Pour Debian
+        apt install -y software-properties-common
+        add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian $RELEASE stable"
+    else
+        # Pour Ubuntu
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable"
+    fi
     apt update
     apt install -y docker-ce
     systemctl enable docker
@@ -111,6 +131,12 @@ ssh $SSH_USER@$VPS_IP << EOF
     
     # Obtenir un certificat
     certbot certonly --standalone --agree-tos --non-interactive --email admin@$DOMAIN -d $DOMAIN -d www.$DOMAIN
+    
+    # En cas d'échec avec www subdomain, essayer sans
+    if [ $? -ne 0 ]; then
+        echo "Tentative d'obtention de certificat sans le sous-domaine www..."
+        certbot certonly --standalone --agree-tos --non-interactive --email admin@$DOMAIN -d $DOMAIN
+    fi
     
     # Copier les certificats pour Nginx
     cp /etc/letsencrypt/live/$DOMAIN/fullchain.pem $APP_DIR/nginx/ssl/cert.pem

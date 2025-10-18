@@ -1,10 +1,11 @@
 # 🚀 GAMR Platform - Déploiement sur VPS Hostinger
 
-Ce guide détaille les étapes pour déployer la plateforme GAMR sur un VPS Hostinger.
+Ce guide détaille les étapes pour déployer la plateforme GAMR sur un VPS Hostinger totalement neuf.
 
 ## 📋 Table des Matières
 
 - [Prérequis](#prérequis)
+- [Première Connexion au VPS](#première-connexion-au-vps)
 - [Configuration du VPS](#configuration-du-vps)
 - [Installation de Docker](#installation-de-docker)
 - [Configuration DNS](#configuration-dns)
@@ -15,18 +16,38 @@ Ce guide détaille les étapes pour déployer la plateforme GAMR sur un VPS Host
 
 ## 🛠️ Prérequis
 
-- Un compte Hostinger avec un VPS (recommandé: au moins 2 vCPU, 4GB RAM)
+- Un compte Hostinger avec un VPS nouvellement créé (recommandé: au moins 2 vCPU, 4GB RAM)
 - Un nom de domaine configuré dans Hostinger
-- Accès SSH au VPS
-- Accès au repository Git du projet GAMR
+- Accès SSH au VPS (informations de connexion fournies par Hostinger)
+- Accès au repository Git du projet GAMR sur votre machine locale
 
-## 💻 Configuration du VPS
+## 🔰 Première Connexion au VPS
 
 ### Étape 1: Se connecter au VPS via SSH
 
 ```bash
 ssh root@votre-ip-vps
 ```
+
+### Étape 2: Changer le mot de passe root
+
+Pour des raisons de sécurité, changez immédiatement le mot de passe root fourni par Hostinger:
+
+```bash
+passwd
+```
+
+Entrez un nouveau mot de passe fort et sécurisé.
+
+## 💻 Configuration du VPS
+
+### Étape 1: Vérifier le système d'exploitation
+
+```bash
+cat /etc/os-release
+```
+
+Cette commande affichera les informations sur la distribution Linux installée sur votre VPS.
 
 ### Étape 2: Mettre à jour le système
 
@@ -68,8 +89,18 @@ apt install -y apt-transport-https ca-certificates curl software-properties-comm
 # Ajouter la clé GPG officielle de Docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 
-# Ajouter le repository Docker
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+# Ajouter le repository Docker (dépend de la distribution)
+DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+RELEASE=$(lsb_release -cs)
+
+if [ "$DISTRO" = "debian" ]; then
+    # Pour Debian
+    apt install -y software-properties-common
+    add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian $RELEASE stable"
+else
+    # Pour Ubuntu
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable"
+fi
 
 # Mettre à jour et installer Docker
 apt update
@@ -114,18 +145,44 @@ Utilisez un outil comme [dnschecker.org](https://dnschecker.org) pour vérifier 
 
 ## 📦 Déploiement de l'Application
 
-### Étape 1: Cloner le repository
+### Étape 1: Préparer le répertoire de l'application
 
 ```bash
 # Créer un répertoire pour l'application
 mkdir -p /opt/gamr
 cd /opt/gamr
+mkdir -p nginx/ssl
+mkdir -p backups
+```
 
+### Étape 2: Déployer avec les scripts automatiques
+
+Le moyen le plus simple de déployer l'application est d'utiliser les scripts de déploiement automatiques depuis votre machine locale:
+
+**Pour Windows (PowerShell):**
+```powershell
+.\scripts\deploy-to-hostinger.ps1 -VpsIp "votre-ip-vps" -Domain "votre-domaine.com"
+```
+
+**Pour Linux/Mac:**
+```bash
+chmod +x scripts/deploy-to-hostinger.sh
+./scripts/deploy-to-hostinger.sh votre-ip-vps votre-domaine.com
+```
+
+Ces scripts effectuent automatiquement toutes les étapes nécessaires pour déployer l'application sur un VPS neuf.
+
+### Étape 3 (Alternative): Déploiement manuel
+
+Si vous préférez déployer manuellement, vous pouvez suivre ces étapes:
+
+```bash
 # Cloner le repository
+cd /opt/gamr
 git clone <repository-url> .
 ```
 
-### Étape 2: Configurer les variables d'environnement
+### Étape 4 (Déploiement manuel): Configurer les variables d'environnement
 
 ```bash
 # Créer le fichier .env
@@ -158,13 +215,14 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX=100
 ```
 
-### Étape 3: Créer les répertoires pour les certificats SSL
+### Étape 5 (Déploiement manuel): Créer les répertoires pour les certificats SSL
 
 ```bash
 mkdir -p nginx/ssl
+mkdir -p backups
 ```
 
-### Étape 4: Déployer avec Docker Compose
+### Étape 6 (Déploiement manuel): Déployer avec Docker Compose
 
 ```bash
 # Construire et démarrer les conteneurs
@@ -181,6 +239,12 @@ apt install -y certbot
 
 # Obtenir un certificat
 certbot certonly --standalone -d votre-domaine.com -d www.votre-domaine.com
+
+# En cas d'échec avec www subdomain, essayer sans
+if [ $? -ne 0 ]; then
+    echo "Tentative d'obtention de certificat sans le sous-domaine www..."
+    certbot certonly --standalone -d votre-domaine.com
+fi
 
 # Copier les certificats pour Nginx
 cp /etc/letsencrypt/live/votre-domaine.com/fullchain.pem nginx/ssl/cert.pem
@@ -246,7 +310,7 @@ cd /opt/gamr
 docker-compose -f docker-compose.prod.yml down
 
 # Récupérer les dernières modifications
-git pull origin main
+git pull origin master
 
 # Reconstruire et redémarrer les conteneurs
 docker-compose -f docker-compose.prod.yml up -d --build

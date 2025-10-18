@@ -1,4 +1,4 @@
-# Script PowerShell pour déployer GAMR Platform sur VPS Hostinger
+# Script PowerShell pour déployer GAMR Platform sur un VPS Hostinger totalement neuf
 # Usage: .\deploy-to-hostinger.ps1 -VpsIp <ip-vps> -Domain <domaine>
 
 param (
@@ -9,7 +9,13 @@ param (
     [string]$Domain,
     
     [Parameter(Mandatory=$false)]
-    [string]$SshUser = "root"
+    [string]$SshUser = "root",
+    
+    [Parameter(Mandatory=$false)]
+    [string]$SshPassword,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$FirstSetup = $true
 )
 
 $AppDir = "/opt/gamr"
@@ -29,6 +35,21 @@ catch {
     Write-Host "❌ Erreur: SSH n'est pas installé ou n'est pas dans le PATH." -ForegroundColor Red
     Write-Host "Veuillez installer OpenSSH ou Git Bash et réessayer." -ForegroundColor Red
     exit 1
+}
+
+# Vérifier la connectivité SSH
+Write-Host "🔍 Vérification de la connectivité SSH..." -ForegroundColor Yellow
+try {
+    $sshTestOutput = ssh -o "BatchMode=yes" -o "ConnectTimeout=5" $SshUser@$VpsIp "echo SSH_CONNECTION_SUCCESSFUL" 2>&1
+    if ($sshTestOutput -match "SSH_CONNECTION_SUCCESSFUL") {
+        Write-Host "✅ Connexion SSH établie avec succès." -ForegroundColor Green
+    } else {
+        Write-Host "⚠️ Impossible d'établir une connexion SSH automatique." -ForegroundColor Yellow
+        Write-Host "Vous devrez peut-être entrer le mot de passe lors des prochaines étapes." -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "⚠️ Impossible d'établir une connexion SSH automatique." -ForegroundColor Yellow
+    Write-Host "Vous devrez peut-être entrer le mot de passe lors des prochaines étapes." -ForegroundColor Yellow
 }
 
 # Générer un JWT secret aléatoire
@@ -55,7 +76,17 @@ timedatectl set-timezone Europe/Paris
 
 # Installer Docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \$(lsb_release -cs) stable"
+# Déterminer la distribution et installer le repository approprié
+DISTRO=\$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+RELEASE=\$(lsb_release -cs)
+if [ "\$DISTRO" = "debian" ]; then
+    # Pour Debian
+    apt install -y software-properties-common
+    add-apt-repository "deb [arch=\$(dpkg --print-architecture)] https://download.docker.com/linux/debian \$RELEASE stable"
+else
+    # Pour Ubuntu
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \$RELEASE stable"
+fi
 apt update
 apt install -y docker-ce
 systemctl enable docker
@@ -78,6 +109,13 @@ Write-Host "📦 Étape 2: Déploiement des fichiers..." -ForegroundColor Yellow
 $tempFile = [System.IO.Path]::GetTempFileName() + ".tar.gz"
 Write-Host "Création de l'archive du projet..."
 git archive --format=tar.gz -o $tempFile HEAD
+
+# Vérifier si l'archive a été créée avec succès
+if (-not (Test-Path $tempFile)) {
+    Write-Host "❌ Erreur: Impossible de créer l'archive du projet." -ForegroundColor Red
+    Write-Host "Veuillez vérifier que vous êtes bien dans un dépôt Git valide." -ForegroundColor Red
+    exit 1
+}
 
 # Transférer l'archive au serveur
 Write-Host "Transfert de l'archive vers le serveur..."
@@ -125,6 +163,12 @@ docker-compose -f $AppDir/docker-compose.prod.yml down 2>/dev/null || true
 
 # Obtenir un certificat
 certbot certonly --standalone --agree-tos --non-interactive --email admin@$Domain -d $Domain -d www.$Domain
+
+# En cas d'échec avec www subdomain, essayer sans
+if [ $? -ne 0 ]; then
+    echo "Tentative d'obtention de certificat sans le sous-domaine www..."
+    certbot certonly --standalone --agree-tos --non-interactive --email admin@$Domain -d $Domain
+fi
 
 # Copier les certificats pour Nginx
 cp /etc/letsencrypt/live/$Domain/fullchain.pem $AppDir/nginx/ssl/cert.pem

@@ -1,14 +1,34 @@
 # 🚀 GAMR Platform - Déploiement sur Hostinger VPS
 
-Ce document fournit des instructions rapides pour déployer la plateforme GAMR sur un VPS Hostinger.
+Ce document fournit des instructions rapides pour déployer la plateforme GAMR sur un VPS Hostinger totalement neuf.
 
 ## 📋 Prérequis
 
-- Un VPS Hostinger (recommandé: au moins 2 vCPU, 4GB RAM)
+- Un VPS Hostinger nouvellement créé (recommandé: au moins 2 vCPU, 4GB RAM)
 - Un nom de domaine configuré dans Hostinger
-- Accès SSH au VPS
+- Accès SSH au VPS (informations de connexion fournies par Hostinger)
 - Git installé sur votre machine locale
 - OpenSSH ou Git Bash installé sur votre machine locale (pour Windows)
+
+## 🔰 Première Connexion au VPS
+
+1. Connectez-vous à votre VPS en utilisant les informations fournies par Hostinger:
+
+```bash
+ssh root@votre-ip-vps
+```
+
+2. Changez immédiatement le mot de passe root:
+
+```bash
+passwd
+```
+
+3. Mettez à jour le système:
+
+```bash
+apt update && apt upgrade -y
+```
 
 ## 🚀 Déploiement Rapide
 
@@ -34,6 +54,8 @@ chmod +x scripts/deploy-to-hostinger.sh
 ```
 
 ## 📝 Que fait le script de déploiement?
+
+> **Note importante**: Nos scripts sont conçus pour fonctionner sur un VPS Hostinger totalement neuf et vont créer toute la structure nécessaire.
 
 1. Prépare le serveur VPS (mise à jour, installation de Docker, etc.)
 2. Déploie les fichiers de l'application
@@ -61,7 +83,7 @@ Pour des instructions plus détaillées et des options avancées, consultez le f
 ```bash
 ssh root@votre-ip-vps
 cd /opt/gamr
-git pull origin main
+git pull origin master
 docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
