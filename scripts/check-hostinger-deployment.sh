@@ -81,3 +81,5 @@ echo ""
 echo "4. Pour voir les logs en temps réel:"
 echo "   ssh $SSH_USER@$VPS_IP 'docker logs -f gamr-platform'"
 echo "------------------------------------------------"
+
+

@@ -230,3 +230,5 @@ Write-Host "------------------------------------------------"
 Write-Host "Pour vous connecter au serveur: ssh $SshUser@$VpsIp"
 Write-Host "Pour plus d'informations, consultez le fichier HOSTINGER_DEPLOYMENT.md"
 Write-Host "------------------------------------------------"
+
+

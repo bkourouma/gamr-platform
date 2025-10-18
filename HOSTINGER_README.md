@@ -82,3 +82,5 @@ docker logs gamr-platform
 ## 🆘 Dépannage
 
 En cas de problème, consultez la section "Dépannage" dans le fichier [HOSTINGER_DEPLOYMENT.md](./HOSTINGER_DEPLOYMENT.md).
+
+

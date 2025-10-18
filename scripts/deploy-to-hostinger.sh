@@ -211,3 +211,5 @@ echo "------------------------------------------------"
 echo "Pour vous connecter au serveur: ssh $SSH_USER@$VPS_IP"
 echo "Pour plus d'informations, consultez le fichier HOSTINGER_DEPLOYMENT.md"
 echo "------------------------------------------------"
+
+

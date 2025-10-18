@@ -349,3 +349,5 @@ lynis audit system
 - Vérifiez régulièrement les mises à jour de sécurité du système
 - Surveillez l'utilisation des ressources pour éviter les problèmes de performance
 - Testez régulièrement le processus de restauration des sauvegardes
+
+

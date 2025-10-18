@@ -89,3 +89,5 @@ Write-Host ""
 Write-Host "4. Pour voir les logs en temps réel:"
 Write-Host "   ssh $SshUser@$VpsIp 'docker logs -f gamr-platform'"
 Write-Host "------------------------------------------------"
+
+
