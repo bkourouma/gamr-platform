@@ -10,10 +10,10 @@ export default defineConfig({
     exclude: ['@prisma/client']
   },
   server: {
-    port: 5173,
+    port: Number(process.env.PORT || process.env.VITE_PORT || 5173),
     proxy: {
       '/api': {
-        target: 'http://localhost:3002',
+        target: process.env.VITE_PROXY_TARGET || `http://localhost:${process.env.BACKEND_PORT || 3002}`,
         changeOrigin: true,
         secure: false
       }

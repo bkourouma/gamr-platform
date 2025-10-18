@@ -14,6 +14,7 @@ export const ActionsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [priorityFilter, setPriorityFilter] = useState<string>('all')
+  const [defenseFilter, setDefenseFilter] = useState<string>('all')
   const [showOverdueOnly, setShowOverdueOnly] = useState(false)
   const [stats, setStats] = useState<any>(null)
   const [showActionForm, setShowActionForm] = useState(false)
@@ -24,6 +25,11 @@ export const ActionsPage: React.FC = () => {
   const { addToast } = useToast()
 
   // Charger les actions et statistiques
+  const getDefenseCodeFromTitle = (title: string): 'LD1' | 'LD2' | 'LD3' | 'LD4' | undefined => {
+    const match = title.match(/^\[(LD[1-4])\]/)
+    return (match?.[1] as any) || undefined
+  }
+
   const loadActions = async () => {
     try {
       setLoading(true)
@@ -38,7 +44,12 @@ export const ActionsPage: React.FC = () => {
         actionsApi.getStats()
       ])
       
-      setActions(actionsResponse.data)
+      const baseActions = actionsResponse.data
+      const filteredByDefense = defenseFilter === 'all'
+        ? baseActions
+        : baseActions.filter(a => getDefenseCodeFromTitle(a.title) === defenseFilter)
+
+      setActions(filteredByDefense)
       setStats(statsResponse)
     } catch (error) {
       console.error('Erreur lors du chargement des actions:', error)
@@ -51,7 +62,7 @@ export const ActionsPage: React.FC = () => {
   // Charger les données au montage et lors des changements de filtres
   useEffect(() => {
     loadActions()
-  }, [searchTerm, statusFilter, priorityFilter, showOverdueOnly])
+  }, [searchTerm, statusFilter, priorityFilter, defenseFilter, showOverdueOnly])
 
   // Mettre à jour le statut d'une action
   const updateActionStatus = async (actionId: string, newStatus: string) => {
@@ -165,9 +176,9 @@ export const ActionsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Actions Correctives</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Priorités d'action</h1>
           <p className="text-gray-600 mt-1">
-            Gérez et suivez les actions correctives pour réduire les risques
+            Gérez et suivez les priorités d'action pour réduire les risques
           </p>
         </div>
         <div className="flex space-x-3">
@@ -293,6 +304,19 @@ export const ActionsPage: React.FC = () => {
             <option value="MEDIUM">Moyenne</option>
             <option value="LOW">Basse</option>
             <option value="VERY_LOW">Très basse</option>
+          </select>
+
+          {/* Filtre ligne de défense */}
+          <select
+            value={defenseFilter}
+            onChange={(e) => setDefenseFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            <option value="all">Toutes les lignes de défense</option>
+            <option value="LD1">LD1 — Périphérie</option>
+            <option value="LD2">LD2 — Périmètre</option>
+            <option value="LD3">LD3 — Entrées et accès</option>
+            <option value="LD4">LD4 — Espace névralgique</option>
           </select>
 
           {/* Filtre en retard */}

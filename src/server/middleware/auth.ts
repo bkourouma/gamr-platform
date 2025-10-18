@@ -38,7 +38,10 @@ export const authMiddleware = async (req: any, res: any, next: any) => {
     
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any
-      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[AUTH] Decoded JWT:', { userId: decoded.userId, exp: decoded.exp })
+      }
+
       // Récupérer l'utilisateur depuis la base de données
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId },
@@ -53,7 +56,10 @@ export const authMiddleware = async (req: any, res: any, next: any) => {
         }
       })
 
+      console.log('[AUTH] User lookup result:', user ? { id: user.id, email: user.email, isActive: user.isActive } : 'null')
+
       if (!user || !user.isActive) {
+        console.log('[AUTH] User not found or inactive')
         return res.status(401).json({ error: 'Utilisateur non trouvé ou inactif' })
       }
 

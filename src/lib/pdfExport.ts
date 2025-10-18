@@ -1,13 +1,5 @@
 import jsPDF from 'jspdf'
-import 'jspdf-autotable'
 import type { Evaluation, EvaluationResponse } from './api'
-
-// Étendre le type jsPDF pour inclure autoTable
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF
-  }
-}
 
 export class PDFExportService {
   private doc: jsPDF
@@ -74,29 +66,58 @@ export class PDFExportService {
     this.currentY += 10
   }
 
+  private addText(text: string, fontSize: number = 11, bold: boolean = false) {
+    this.checkPageBreak(10)
+
+    this.doc.setFontSize(fontSize)
+    this.doc.setFont('helvetica', bold ? 'bold' : 'normal')
+    this.doc.text(text, this.margin, this.currentY)
+    this.currentY += fontSize * 0.6 + 5
+  }
+
   private addTable(headers: string[], rows: string[][]) {
     this.checkPageBreak(50)
 
-    this.doc.autoTable({
-      head: [headers],
-      body: rows,
-      startY: this.currentY,
-      margin: { left: this.margin, right: this.margin },
-      styles: {
-        fontSize: 10,
-        cellPadding: 5
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: 'bold'
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245]
+    // Add headers
+    this.doc.setFontSize(10)
+    this.doc.setFont('helvetica', 'bold')
+    this.doc.setFillColor(41, 128, 185)
+    this.doc.setTextColor(255, 255, 255)
+
+    // Simple header row
+    let headerText = headers.join(' | ')
+    this.doc.text(headerText, this.margin, this.currentY)
+    this.currentY += 12
+
+    // Reset text color for content
+    this.doc.setTextColor(0, 0, 0)
+    this.doc.setFont('helvetica', 'normal')
+
+    // Add rows
+    rows.forEach((row, index) => {
+      this.checkPageBreak(15)
+
+      // Alternate background color effect with text
+      if (index % 2 === 0) {
+        this.doc.setTextColor(0, 0, 0)
+      } else {
+        this.doc.setTextColor(60, 60, 60)
       }
+
+      // Format each row
+      const rowText = row.join(' | ')
+      const lines = this.doc.splitTextToSize(rowText, this.pageWidth - 2 * this.margin)
+
+      lines.forEach((line: string) => {
+        this.checkPageBreak(8)
+        this.doc.text(line, this.margin, this.currentY)
+        this.currentY += 8
+      })
+
+      this.currentY += 3 // Space between rows
     })
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15
+    this.currentY += 10
   }
 
   private checkPageBreak(requiredSpace: number) {
@@ -154,15 +175,36 @@ export class PDFExportService {
   private formatResponse(response: EvaluationResponse, questionType: string): string {
     switch (questionType) {
       case 'YES_NO':
-        return response.booleanValue ? 'Oui' : 'Non'
+        return response.booleanValue === true ? 'Oui' : response.booleanValue === false ? 'Non' : 'Non répondu'
       case 'TEXT':
         return response.textValue || 'Aucune réponse'
       case 'NUMBER':
         return response.numberValue?.toString() || 'Aucune réponse'
       case 'SCALE':
         return `${response.numberValue || 0}/5`
+      case 'MULTIPLE_CHOICE':
+        return response.textValue || response.jsonValue?.toString() || 'Aucune réponse'
+      case 'FILE_UPLOAD':
+        return response.jsonValue ? 'Fichier joint' : 'Aucun fichier'
+      case 'DATE':
+        return response.textValue ? new Date(response.textValue).toLocaleDateString('fr-FR') : 'Aucune date'
+      case 'TIME':
+        return response.textValue || 'Aucune heure'
       default:
-        return response.textValue || response.numberValue?.toString() || 'Aucune réponse'
+        // Essayer de retourner la valeur la plus appropriée
+        if (response.booleanValue !== undefined) {
+          return response.booleanValue ? 'Oui' : 'Non'
+        }
+        if (response.textValue) {
+          return response.textValue
+        }
+        if (response.numberValue !== undefined) {
+          return response.numberValue.toString()
+        }
+        if (response.jsonValue) {
+          return JSON.stringify(response.jsonValue)
+        }
+        return 'Aucune réponse'
     }
   }
 
@@ -210,34 +252,109 @@ export class PDFExportService {
       if (evaluation.responses && evaluation.responses.length > 0) {
         this.addSection('Réponses aux Questions', '')
 
-        // Grouper les réponses par groupe de questions
-        const responsesByGroup = new Map<string, EvaluationResponse[]>()
-        
+        // Créer une map pour organiser les réponses par groupe et objectif
+        const responsesByGroup = new Map<string, Map<string, EvaluationResponse[]>>()
+
+        // Organiser les réponses en utilisant les données du template
         evaluation.responses.forEach(response => {
-          if (response.question?.objective?.group?.title) {
-            const groupTitle = response.question.objective.group.title
-            if (!responsesByGroup.has(groupTitle)) {
-              responsesByGroup.set(groupTitle, [])
+          if (response.question && evaluation.template?.questionGroups) {
+            // Trouver le groupe et l'objectif correspondant à cette question
+            let foundGroup = null
+            let foundObjective = null
+
+            for (const group of evaluation.template.questionGroups) {
+              for (const objective of group.objectives || []) {
+                if (objective.questions?.some(q => q.id === response.questionId)) {
+                  foundGroup = group
+                  foundObjective = objective
+                  break
+                }
+              }
+              if (foundGroup) break
             }
-            responsesByGroup.get(groupTitle)!.push(response)
+
+            if (foundGroup && foundObjective) {
+              const groupTitle = foundGroup.title
+              const objectiveTitle = foundObjective.title
+
+              if (!responsesByGroup.has(groupTitle)) {
+                responsesByGroup.set(groupTitle, new Map())
+              }
+
+              const groupMap = responsesByGroup.get(groupTitle)!
+              if (!groupMap.has(objectiveTitle)) {
+                groupMap.set(objectiveTitle, [])
+              }
+
+              groupMap.get(objectiveTitle)!.push(response)
+            }
           }
         })
 
-        // Afficher les réponses par groupe
-        responsesByGroup.forEach((responses, groupTitle) => {
-          this.addSection(groupTitle, '')
+        // Afficher les réponses par groupe et objectif
+        if (responsesByGroup.size > 0) {
+          responsesByGroup.forEach((objectivesMap, groupTitle) => {
+            this.addSection(groupTitle, '')
 
-          const tableRows = responses.map(response => [
-            response.question?.text || 'Question inconnue',
-            this.formatResponse(response, response.question?.type || 'TEXT'),
-            response.comment || ''
-          ])
+            objectivesMap.forEach((responses, objectiveTitle) => {
+              // Sous-section pour l'objectif
+              this.addText(`Objectif: ${objectiveTitle}`, 12, true)
+              this.currentY += 5
+
+              const tableRows = responses.map(response => {
+                const row = [
+                  response.question?.text || 'Question inconnue',
+                  this.formatResponse(response, response.question?.type || 'TEXT'),
+                  response.description || '',
+                  response.comment || ''
+                ]
+
+                // Ajouter les scores si disponibles
+                if (response.facilityScore || response.constraintScore) {
+                  const scores = []
+                  if (response.facilityScore) scores.push(`Facilité: ${response.facilityScore}`)
+                  if (response.constraintScore) scores.push(`Contrainte: ${response.constraintScore}`)
+                  row[3] = (response.comment ? response.comment + ' | ' : '') + scores.join(', ')
+                }
+
+                return row
+              })
+
+              this.addTable(
+                ['Question', 'Réponse', 'Description', 'Commentaire/Scores'],
+                tableRows
+              )
+            })
+          })
+        } else {
+          // Fallback: afficher toutes les réponses sans groupement
+          this.addText('Toutes les réponses', 12, true)
+          this.currentY += 5
+
+          const tableRows = evaluation.responses.map(response => {
+            const row = [
+              response.question?.text || `Question ID: ${response.questionId}`,
+              this.formatResponse(response, response.question?.type || 'TEXT'),
+              response.description || '',
+              response.comment || ''
+            ]
+
+            // Ajouter les scores si disponibles
+            if (response.facilityScore || response.constraintScore) {
+              const scores = []
+              if (response.facilityScore) scores.push(`Facilité: ${response.facilityScore}`)
+              if (response.constraintScore) scores.push(`Contrainte: ${response.constraintScore}`)
+              row[3] = (response.comment ? response.comment + ' | ' : '') + scores.join(', ')
+            }
+
+            return row
+          })
 
           this.addTable(
-            ['Question', 'Réponse', 'Commentaire'],
+            ['Question', 'Réponse', 'Description', 'Commentaire/Scores'],
             tableRows
           )
-        })
+        }
       }
 
       // Fiches de risque générées
@@ -248,13 +365,49 @@ export class PDFExportService {
           risk.target,
           risk.scenario,
           risk.riskScore?.toString() || 'N/A',
-          risk.priority || 'N/A'
+          risk.priority || 'N/A',
+          risk.aiSuggestions?.confidence ? `${Math.round(risk.aiSuggestions.confidence * 100)}%` : 'N/A'
         ])
 
         this.addTable(
-          ['Cible', 'Scénario', 'Score', 'Priorité'],
+          ['Cible', 'Scénario', 'Score', 'Priorité', 'Confiance IA'],
           riskRows
         )
+
+        // Ajouter les détails des analyses IA pour chaque risque
+        evaluation.generatedRisks.forEach((risk, index) => {
+          if (risk.aiSuggestions && risk.aiSuggestions.analysis) {
+            this.addSection(`Analyse IA - ${risk.target}`, '')
+
+            const aiAnalysis = risk.aiSuggestions.analysis
+            let analysisText = ''
+
+            if (aiAnalysis.overallAssessment) {
+              analysisText += `Évaluation globale: ${aiAnalysis.overallAssessment}\n\n`
+            }
+
+            if (aiAnalysis.probability) {
+              analysisText += `Probabilité (${aiAnalysis.probability.score}/3): ${aiAnalysis.probability.explanation}\n\n`
+            }
+
+            if (aiAnalysis.vulnerability) {
+              analysisText += `Vulnérabilité (${aiAnalysis.vulnerability.score}/4): ${aiAnalysis.vulnerability.explanation}\n\n`
+            }
+
+            if (aiAnalysis.impact) {
+              analysisText += `Repercussions (${aiAnalysis.impact.score}/5): ${aiAnalysis.impact.explanation}\n\n`
+            }
+
+            if (risk.aiSuggestions.recommendations && risk.aiSuggestions.recommendations.length > 0) {
+              analysisText += 'Recommandations:\n'
+              risk.aiSuggestions.recommendations.forEach((rec: string) => {
+                analysisText += `• ${rec}\n`
+              })
+            }
+
+            this.addParagraph(analysisText)
+          }
+        })
       }
 
       // Pied de page

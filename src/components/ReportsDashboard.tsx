@@ -9,7 +9,7 @@ export const ReportsDashboard: React.FC = () => {
   const reportTypes = [
     {
       id: 'risks',
-      title: 'Fiches de Risques',
+      title: 'GAMR',
       description: 'Analyse complète des risques identifiés',
       icon: FileText,
       color: 'from-blue-500 to-blue-600',
@@ -18,8 +18,8 @@ export const ReportsDashboard: React.FC = () => {
     },
     {
       id: 'actions',
-      title: 'Actions Correctives',
-      description: 'Suivi des mesures de mitigation',
+      title: 'Priorités d\'action',
+      description: 'Suivi des priorités d\'action',
       icon: Calendar,
       color: 'from-green-500 to-green-600',
       bgColor: 'from-green-50 to-green-100',
@@ -27,12 +27,12 @@ export const ReportsDashboard: React.FC = () => {
     },
     {
       id: 'evaluations',
-      title: 'Évaluations',
+      title: 'Questionnaire',
       description: 'Résultats des questionnaires GAMR',
       icon: BarChart3,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'from-purple-50 to-purple-100',
-      stats: '8 évaluations complètes'
+      stats: '8 questionnaires complètes'
     },
     {
       id: 'analytics',
@@ -48,19 +48,19 @@ export const ReportsDashboard: React.FC = () => {
   const recentReports = [
     {
       name: 'Rapport Mensuel - Janvier 2024',
-      type: 'Fiches de Risques',
+      type: 'GAMR',
       date: '2024-01-15',
       size: '2.4 MB'
     },
     {
-      name: 'Actions Correctives Q1',
+      name: 'Priorités d\'action Q1',
       type: 'Actions',
       date: '2024-01-10',
       size: '1.8 MB'
     },
     {
-      name: 'Évaluation Sécurité TechCorp',
-      type: 'Évaluations',
+      name: 'Questionnaire Sécurité TechCorp',
+      type: 'Questionnaire',
       date: '2024-01-08',
       size: '3.2 MB'
     }

@@ -41,14 +41,27 @@ export const EditRiskSheet: React.FC = () => {
     setSaving(true)
 
     try {
-      await riskSheetsApi.update(id, {
+      // Préparer les données avec les recommandations IA
+      const riskData: any = {
         target: data.target,
         scenario: data.scenario,
         probability: data.probability,
         vulnerability: data.vulnerability,
-        impact: data.impact,
-        category: data.category
-      })
+        impact: data.impact
+      }
+
+      // Ajouter les recommandations IA si disponibles
+      if (data.aiAnalysis) {
+        riskData.aiSuggestions = {
+          analysis: data.aiAnalysis,
+          recommendations: data.aiAnalysis.overallAssessment ? [data.aiAnalysis.overallAssessment] : [],
+          confidence: data.aiAnalysis.confidenceLevel || 0.8,
+          timestamp: new Date().toISOString(),
+          basedOnEvaluations: data.aiAnalysis.basedOnEvaluations || []
+        }
+      }
+
+      await riskSheetsApi.update(id, riskData)
 
       console.log('Fiche sauvegardée avec succès')
 

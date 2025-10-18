@@ -19,7 +19,8 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
   const [filters, setFilters] = useState({
     priority: '',
     status: '',
-    category: ''
+    category: '',
+    defenseLine: '' as '' | 'LD1' | 'LD2' | 'LD3' | 'LD4'
   })
   const [generating, setGenerating] = useState(false)
   const { addToast } = useToast()
@@ -48,19 +49,12 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
         return
       }
 
-      // Générer un rapport pour la première fiche (exemple)
-      // Dans une vraie application, on pourrait générer un rapport consolidé
+      // Générer un rapport selon le nombre de fiches
       if (riskSheets.length === 1) {
         await PDFService.generateRiskSheetReport(riskSheets[0])
       } else {
-        // Générer un rapport consolidé (à implémenter)
-        addToast({
-          type: 'info',
-          title: `Génération d'un rapport consolidé pour ${riskSheets.length} fiches de risques`,
-          duration: 5000
-        })
-        // Pour l'instant, générer le rapport de la première fiche
-        await PDFService.generateRiskSheetReport(riskSheets[0])
+        // Générer un rapport consolidé avec analyse IA
+        await PDFService.generateConsolidatedRiskReport(riskSheets)
       }
 
       addToast({
@@ -96,6 +90,11 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
       const response = await actionsApi.getAll(params)
       const actions = response.data
 
+      // Filtrer par ligne de défense si sélectionnée (préfixe du titre [LDx])
+      const filtered = filters.defenseLine
+        ? actions.filter((a: Action) => a.title.startsWith(`[${filters.defenseLine}]`))
+        : actions
+
       if (actions.length === 0) {
         addToast({
           type: 'warning',
@@ -105,7 +104,8 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
         return
       }
 
-      await PDFService.generateActionsReport(actions, 'Rapport des Actions Correctives')
+      const titleSuffix = filters.defenseLine ? ` — ${filters.defenseLine}` : ''
+      await PDFService.generateActionsReport(filtered, `Rapport des Priorités d'action${titleSuffix}`)
       addToast({
         type: 'success',
         title: 'Rapport PDF généré avec succès',
@@ -194,7 +194,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
                   }`}
                 >
                   <Calendar className="w-6 h-6 mx-auto mb-2" />
-                  <div className="text-sm font-medium">Actions Correctives</div>
+                  <div className="text-sm font-medium">Priorités d'action</div>
                 </button>
                 
                 <button
@@ -263,19 +263,35 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
 
                 {/* Statut (pour les actions) ou Catégorie (pour les risques) */}
                 {reportType === 'actions' ? (
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Statut</label>
-                    <select
-                      value={filters.status}
-                      onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                      <option value="">Tous les statuts</option>
-                      <option value="TODO">À faire</option>
-                      <option value="IN_PROGRESS">En cours</option>
-                      <option value="COMPLETED">Terminées</option>
-                      <option value="CANCELLED">Annulées</option>
-                    </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Statut</label>
+                      <select
+                        value={filters.status}
+                        onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      >
+                        <option value="">Tous les statuts</option>
+                        <option value="TODO">À faire</option>
+                        <option value="IN_PROGRESS">En cours</option>
+                        <option value="COMPLETED">Terminées</option>
+                        <option value="CANCELLED">Annulées</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Ligne de défense</label>
+                      <select
+                        value={filters.defenseLine}
+                        onChange={(e) => setFilters(prev => ({ ...prev, defenseLine: e.target.value as any }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      >
+                        <option value="">Toutes</option>
+                        <option value="LD1">LD1 — Périphérie</option>
+                        <option value="LD2">LD2 — Périmètre</option>
+                        <option value="LD3">LD3 — Entrées et accès</option>
+                        <option value="LD4">LD4 — Espace névralgique</option>
+                      </select>
+                    </div>
                   </div>
                 ) : (
                   <div>

@@ -1,0 +1,3 @@
+Frontend: React 19, TypeScript, Vite, Tailwind CSS, React Router, Lucide React, Recharts, html2canvas, jsPDF.
+Backend: Node.js, Express, TypeScript, Prisma ORM, SQLite (dev)/PostgreSQL (optional prod), JWT, bcryptjs, CORS, Helmet, Morgan, express-rate-limit.
+Tooling: TSX, Concurrently, PostCSS/Autoprefixer, Docker/Docker Compose, Azure CLI, GitHub Actions. Prisma client generated at build/runtime; Prisma logging verbose in dev.

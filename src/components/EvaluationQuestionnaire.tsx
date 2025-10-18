@@ -224,8 +224,8 @@ export const EvaluationQuestionnaire: React.FC<QuestionnaireProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gradient">Évaluation Sécuritaire</h1>
-            <p className="text-gray-600">Questionnaire d'évaluation sécuritaire intelligente</p>
+            <h1 className="text-3xl font-bold text-gradient">Questionnaire</h1>
+            <p className="text-gray-600">Questionnaire d'évaluation intelligente</p>
           </div>
           <Badge variant="gradient" pulse>
             <Brain className="w-3 h-3 mr-1" />

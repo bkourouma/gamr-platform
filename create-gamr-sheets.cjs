@@ -2,9 +2,9 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-// Fonction pour calculer le score GAMR
+// Fonction pour calculer le score GAMR (formule classique)
 function calculateRiskScore(probability, vulnerability, impact) {
-  return ((probability * vulnerability * impact) / 60) * 100
+  return probability * vulnerability * impact
 }
 
 // Fonction pour déterminer la priorité basée sur le score

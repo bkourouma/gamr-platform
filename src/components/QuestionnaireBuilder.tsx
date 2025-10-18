@@ -31,6 +31,7 @@ interface Question {
   weight: number
   options?: string[]
   dependsOn?: any
+  ouiMeansPositive?: boolean
 }
 
 interface Objective {
@@ -92,6 +93,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
     helpText?: string
     placeholder?: string
     options?: string[]
+    ouiMeansPositive?: boolean
   } | null>(null)
 
   useEffect(() => {
@@ -101,7 +103,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
   const handleSave = async () => {
     try {
       setIsSaving(true)
-      console.log('Sauvegarde des groupes:', groups)
+      console.log('Sauvegarde des lignes de défense:', groups)
       await onSave(groups)
       addToast(createSuccessToast('Questionnaire sauvegardé avec succès'))
     } catch (error) {
@@ -136,7 +138,18 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
     })
   }
 
-  const startEdit = (type: 'group' | 'objective' | 'question', id: string, title: string, description: string, questionType?: string, isRequired?: boolean, helpText?: string, placeholder?: string, options?: string[]) => {
+  const startEdit = (
+    type: 'group' | 'objective' | 'question',
+    id: string,
+    title: string,
+    description: string,
+    questionType?: string,
+    isRequired?: boolean,
+    helpText?: string,
+    placeholder?: string,
+    options?: string[],
+    ouiMeansPositive?: boolean
+  ) => {
     setEditForm({
       type,
       id,
@@ -146,7 +159,8 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
       isRequired,
       helpText,
       placeholder,
-      options: options || []
+      options: options || [],
+      ouiMeansPositive
     })
   }
 
@@ -190,7 +204,8 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
                       isRequired: editForm.isRequired ?? question.isRequired,
                       helpText: editForm.helpText,
                       placeholder: editForm.placeholder,
-                      options: editForm.options?.length ? editForm.options : question.options
+                      options: editForm.options?.length ? editForm.options : question.options,
+                      ouiMeansPositive: editForm.ouiMeansPositive !== false
                     }
                   }
                   return question
@@ -212,7 +227,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
   const addGroup = () => {
     const newGroup: QuestionGroup = {
       id: `group_${Date.now()}`,
-      title: 'Nouveau groupe',
+      title: 'Nouvelle ligne de défense',
       description: '',
       orderIndex: groups.length,
       objectives: []
@@ -272,7 +287,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
       return group
     }))
 
-    startEdit('question', newQuestion.id, newQuestion.text, '', newQuestion.type, newQuestion.isRequired)
+    startEdit('question', newQuestion.id, newQuestion.text, '', newQuestion.type, newQuestion.isRequired, undefined, undefined, undefined, true)
   }
 
   const deleteItem = (type: 'group' | 'objective' | 'question', id: string, parentId?: string) => {
@@ -320,7 +335,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
         <div>
           <h2 className="text-xl font-semibold text-gray-900">Constructeur de questionnaire</h2>
           <p className="text-gray-600 text-sm mt-1">
-            {groups.length} groupe(s) • {groups.reduce((total, g) => total + g.objectives.length, 0)} objectif(s) • {getTotalQuestions()} question(s)
+            {groups.length} ligne(s) de défense • {groups.reduce((total, g) => total + g.objectives.length, 0)} objectif(s) • {getTotalQuestions()} question(s)
           </p>
         </div>
         {!readOnly && (
@@ -330,7 +345,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
               onClick={addGroup}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Ajouter un groupe
+              Ajouter une ligne de défense
             </Button>
             <Button
               onClick={handleSave}
@@ -356,9 +371,9 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
           <Card variant="glass">
             <CardContent className="p-12 text-center">
               <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun groupe de questions</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune ligne de défense</h3>
               <p className="text-gray-600 mb-6">
-                Commencez par créer votre premier groupe de questions.
+                Commencez par créer votre première ligne de défense.
               </p>
               {!readOnly && (
                 <Button
@@ -366,7 +381,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
                   className="bg-gradient-to-r from-primary-600 to-primary-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Créer un groupe
+                  Créer une ligne de défense
                 </Button>
               )}
             </CardContent>
@@ -440,7 +455,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
                   {group.objectives.length === 0 ? (
                     <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
                       <HelpCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-600 mb-4">Aucun objectif dans ce groupe</p>
+                      <p className="text-gray-600 mb-4">Aucun objectif dans cette ligne de défense</p>
                       {!readOnly && (
                         <Button
                           variant="outline"
@@ -543,6 +558,9 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
                                           <p className="text-xs text-gray-600">
                                             {getQuestionTypeLabel(question.type)}
                                             {question.isRequired && ' • Obligatoire'}
+                                            {question.type === 'YES_NO' && (
+                                              <> • {question.ouiMeansPositive === false ? 'Oui = négatif' : 'Oui = positif'}</>
+                                            )}
                                           </p>
                                         </div>
                                       </div>
@@ -552,7 +570,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
                                           <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => startEdit('question', question.id, question.text, '', question.type, question.isRequired, question.helpText, question.placeholder, question.options)}
+                                              onClick={() => startEdit('question', question.id, question.text, '', question.type, question.isRequired, question.helpText, question.placeholder, question.options, question.ouiMeansPositive)}
                                           >
                                             <Edit className="w-3 h-3" />
                                           </Button>
@@ -592,7 +610,7 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">
-                Modifier {editForm.type === 'group' ? 'le groupe' : editForm.type === 'objective' ? 'l\'objectif' : 'la question'}
+                Modifier {editForm.type === 'group' ? 'la ligne de défense' : editForm.type === 'objective' ? 'l\'objectif' : 'la question'}
               </h3>
               <Button variant="ghost" size="sm" onClick={cancelEdit}>
                 <X className="w-4 h-4" />
@@ -697,6 +715,23 @@ export const QuestionnaireBuilder: React.FC<QuestionnaireBuilderProps> = ({
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         placeholder="Option 1&#10;Option 2&#10;Option 3"
                       />
+                    </div>
+                  )}
+
+                  {editForm.questionType === 'YES_NO' && (
+                    <div>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={editForm.ouiMeansPositive !== false}
+                          onChange={(e) => setEditForm({ ...editForm, ouiMeansPositive: e.target.checked })}
+                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <span className="text-sm text-gray-700">Oui = positif (protection/atténuation)</span>
+                      </label>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Décochez si, pour cette question, une réponse "Oui" doit être considérée comme négative (exposition/aggravation).
+                      </p>
                     </div>
                   )}
                 </>

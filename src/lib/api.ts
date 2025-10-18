@@ -1,5 +1,19 @@
 // Service API pour communiquer avec le backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
+// Default to relative path so Vite proxy and production reverse proxy handle routing
+// In development, if we detect we're not on the standard Vite port (5173), use direct backend connection
+const isDev = import.meta.env.DEV
+const isNonStandardPort = isDev && window.location.port !== '5173' && window.location.port !== ''
+const directBackendUrl = `http://localhost:${import.meta.env.VITE_BACKEND_PORT || '3002'}/api`
+
+const API_BASE_URL = (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) 
+  || (isNonStandardPort ? directBackendUrl : '/api')
+
+// Log the API URL in development for debugging
+if (isDev) {
+  console.log('[GAMR API] Using API base URL:', API_BASE_URL)
+  console.log('[GAMR API] Current port:', window.location.port)
+  console.log('[GAMR API] Backend port from env:', import.meta.env.VITE_BACKEND_PORT || '3002 (default)')
+}
 
 // Types pour les réponses API
 export interface ApiResponse<T> {
@@ -29,6 +43,7 @@ export interface RiskSheet {
   riskScore: number
   priority: string
   category?: string
+  aiSuggestions?: any // Recommandations IA
   version: number
   isArchived: boolean
   reviewDate?: string
@@ -150,14 +165,21 @@ class ApiClient {
         return null as T
       }
 
-      // Pour les autres réponses, parser le JSON
-      const data = await response.json()
+      // Pour les autres réponses, parser le JSON si possible
+      let data: any = null
+      const text = await response.text()
+      try {
+        data = text ? JSON.parse(text) : null
+      } catch (e) {
+        // Non-JSON (e.g., HTML) for some error responses like proxies; construct a fallback
+        data = { error: text || 'Réponse non-JSON du serveur' }
+      }
 
       if (!response.ok) {
         throw new ApiError(
-          data.error || 'Une erreur est survenue',
+          (data && data.error) || 'Une erreur est survenue',
           response.status,
-          data.details
+          data && data.details
         )
       }
 
@@ -296,6 +318,7 @@ export const riskSheetsApi = {
     vulnerability: number
     impact: number
     category?: string
+    aiSuggestions?: any
   }): Promise<RiskSheet> {
     return apiClient.post<RiskSheet>('/risk-sheets', data)
   },
@@ -307,6 +330,7 @@ export const riskSheetsApi = {
     vulnerability: number
     impact: number
     category?: string
+    aiSuggestions?: any
   }): Promise<RiskSheet> {
     return apiClient.put<RiskSheet>(`/risk-sheets/${id}`, data)
   },
@@ -321,6 +345,7 @@ export const riskSheetsApi = {
     highRisks: number
     recentRisks: number
     risksByCategory: Array<{ category: string; count: number }>
+    averageRiskScore: number
   }> {
     return apiClient.get('/risk-sheets/stats/dashboard')
   },
@@ -426,6 +451,7 @@ export const actionsApi = {
     title: string
     description: string
     dueDate?: Date
+    status?: string
     priority?: string
     assigneeId?: string
     riskSheetId: string
@@ -766,6 +792,7 @@ export interface Question {
   placeholder?: string
   weight: number
   options?: string[]
+  ouiMeansPositive?: boolean
 }
 
 export interface EvaluationResponse {
@@ -1086,7 +1113,7 @@ export interface AnalyticsDashboardData {
 
 // Helper functions for API calls
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('gamr_token')
   return {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` })

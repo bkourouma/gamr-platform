@@ -105,17 +105,6 @@ router.get('/me', authMiddleware, async (req, res) => {
             location: true
           }
         }
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        createdAt: true,
-        tenant: true
       }
     })
 

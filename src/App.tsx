@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './components/Toast'
 import { ProtectedRoute, EvaluatorRoute } from './components/ProtectedRoute'
@@ -22,6 +22,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage'
 import { TenantsManagement } from './pages/TenantsManagement'
 import { UsersManagement } from './pages/UsersManagement'
 import { ChatPage } from './pages/ChatPage'
+import { Settings } from './pages/Settings'
 
 import { Login } from './pages/Login'
 import { Layout } from './components/Layout'
@@ -180,6 +181,17 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             } />
+
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Settings />
+                </Layout>
+              </ProtectedRoute>
+            } />
+
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </Router>

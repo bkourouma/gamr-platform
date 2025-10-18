@@ -1,4 +1,4 @@
-import { prisma } from '../prisma'
+import { prisma } from '../../server/lib/prisma'
 import type { EmbeddingDocument, DocumentMetadata } from './types'
 
 export class DataExtractor {
@@ -105,7 +105,6 @@ export class DataExtractor {
     const actions = await prisma.action.findMany({
       where: { tenantId },
       include: {
-        author: true,
         assignee: true,
         riskSheet: true
       }
@@ -121,10 +120,6 @@ export class DataExtractor {
         title: action.title,
         createdAt: action.createdAt.toISOString(),
         updatedAt: action.updatedAt.toISOString(),
-        author: {
-          id: action.author.id,
-          name: `${action.author.firstName} ${action.author.lastName}`
-        },
         action: {
           status: action.status,
           priority: action.priority,

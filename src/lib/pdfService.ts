@@ -3,6 +3,16 @@ import html2canvas from 'html2canvas'
 import { type RiskSheet, type Action, type Evaluation } from './api'
 
 export class PDFService {
+  // Ensure there is space left on the page, otherwise create a new one
+  private static ensureSpace(doc: jsPDF, yPosition: number, requiredHeight: number = 20): number {
+    const pageHeight = doc.internal.pageSize.height
+    const bottomMargin = 20
+    if (yPosition + requiredHeight > pageHeight - bottomMargin) {
+      doc.addPage()
+      return 30 // top margin for new page
+    }
+    return yPosition
+  }
   private static addHeader(doc: jsPDF, title: string) {
     // Logo et en-tête
     doc.setFillColor(59, 130, 246) // Bleu primary
@@ -166,8 +176,9 @@ export class PDFService {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(11)
     const scenarioLines = doc.splitTextToSize(riskSheet.scenario, 170)
+    yPosition = this.ensureSpace(doc, yPosition, scenarioLines.length * 6 + 10)
     doc.text(scenarioLines, 20, yPosition)
-    yPosition += scenarioLines.length * 5 + 10
+    yPosition += scenarioLines.length * 6 + 12
 
     // Score de risque avec graphique
     doc.setFontSize(14)
@@ -176,7 +187,7 @@ export class PDFService {
     
     // Graphique circulaire
     this.addRiskScoreChart(doc, 120, yPosition - 10, Math.round(riskSheet.riskScore))
-    yPosition += 25
+    yPosition += 28
 
     // Priorité
     doc.setFontSize(12)
@@ -188,7 +199,7 @@ export class PDFService {
     doc.rect(60, yPosition - 5, 30, 8, 'F')
     doc.setTextColor(255, 255, 255)
     doc.text(riskSheet.priority, 75, yPosition, { align: 'center' })
-    yPosition += 15
+    yPosition += 18
 
     // Métriques détaillées
     doc.setTextColor(0, 0, 0)
@@ -222,7 +233,7 @@ export class PDFService {
       doc.text(metric.value, x + 25, yPosition + 15, { align: 'center' })
       doc.setFont('helvetica', 'normal')
     })
-    yPosition += 25
+    yPosition += 28
 
     // Catégorie et tags
     if (riskSheet.category) {
@@ -231,34 +242,114 @@ export class PDFService {
       doc.text('Catégorie:', 20, yPosition)
       doc.setFont('helvetica', 'normal')
       doc.text(riskSheet.category, 60, yPosition)
-      yPosition += 10
+      yPosition += 12
     }
 
-    // Suggestions IA
+    // Analyse et Recommandations IA
     if (riskSheet.aiSuggestions) {
       yPosition += 10
       doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      doc.text('Suggestions IA:', 20, yPosition)
+      doc.text('Analyse IA:', 20, yPosition)
       yPosition += 8
-      
-      doc.setFontSize(11)
-      doc.setFont('helvetica', 'normal')
-      const suggestions = Array.isArray(riskSheet.aiSuggestions) 
-        ? riskSheet.aiSuggestions 
-        : [riskSheet.aiSuggestions]
-      
-      suggestions.forEach((suggestion: any, index: number) => {
-        const text = typeof suggestion === 'string' ? suggestion : suggestion.text || suggestion.description
-        if (text) {
-          doc.text(`• ${text}`, 25, yPosition)
+
+      const aiData = riskSheet.aiSuggestions
+
+      // Niveau de confiance
+      if (aiData.confidence) {
+        doc.setFontSize(11)
+        doc.setFont('helvetica', 'bold')
+        doc.text('Niveau de confiance:', 20, yPosition)
+        doc.setFont('helvetica', 'normal')
+        doc.text(`${Math.round(aiData.confidence * 100)}%`, 90, yPosition)
+        yPosition += 8
+      }
+
+      // Analyse détaillée
+      if (aiData.analysis) {
+        doc.setFont('helvetica', 'bold')
+        doc.text('Évaluation détaillée:', 20, yPosition)
+        yPosition += 6
+
+        // Probabilité
+        if (aiData.analysis.probability) {
+          doc.setFont('helvetica', 'bold')
+          doc.text(`Probabilité (${aiData.analysis.probability.score}/3):`, 25, yPosition)
           yPosition += 6
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(10)
+          const probLines = doc.splitTextToSize(aiData.analysis.probability.explanation, 160)
+          yPosition = this.ensureSpace(doc, yPosition, probLines.length * 6 + 6)
+          doc.text(probLines, 25, yPosition)
+          yPosition += probLines.length * 6 + 6
         }
-      })
+
+        // Vulnérabilité
+        if (aiData.analysis.vulnerability) {
+          doc.setFontSize(11)
+          doc.setFont('helvetica', 'bold')
+          doc.text(`Vulnérabilité (${aiData.analysis.vulnerability.score}/4):`, 25, yPosition)
+          yPosition += 6
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(10)
+          const vulnLines = doc.splitTextToSize(aiData.analysis.vulnerability.explanation, 160)
+          yPosition = this.ensureSpace(doc, yPosition, vulnLines.length * 6 + 6)
+          doc.text(vulnLines, 25, yPosition)
+          yPosition += vulnLines.length * 6 + 6
+        }
+
+        // Impact
+        if (aiData.analysis.impact) {
+          doc.setFontSize(11)
+          doc.setFont('helvetica', 'bold')
+          doc.text(`Repercussions (${aiData.analysis.impact.score}/5):`, 25, yPosition)
+          yPosition += 6
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(10)
+          const impactLines = doc.splitTextToSize(aiData.analysis.impact.explanation, 160)
+          yPosition = this.ensureSpace(doc, yPosition, impactLines.length * 6 + 8)
+          doc.text(impactLines, 25, yPosition)
+          yPosition += impactLines.length * 6 + 10
+        }
+      }
+
+      // Recommandations
+      if (aiData.recommendations && aiData.recommendations.length > 0) {
+        doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
+        doc.text('Recommandations:', 20, yPosition)
+        yPosition += 8
+
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        aiData.recommendations.forEach((recommendation: string) => {
+          const recLines = doc.splitTextToSize(`• ${recommendation}`, 160)
+          yPosition = this.ensureSpace(doc, yPosition, recLines.length * 6 + 4)
+          doc.text(recLines, 25, yPosition)
+          yPosition += recLines.length * 6 + 4
+        })
+        yPosition += 6
+      }
+
+      // Basé sur les évaluations
+      if (aiData.basedOnEvaluations && aiData.basedOnEvaluations.length > 0) {
+        doc.setFontSize(10)
+        doc.setTextColor(100, 100, 100)
+        doc.text(`Basé sur ${aiData.basedOnEvaluations.length} évaluation(s)`, 20, yPosition)
+        yPosition += 5
+      }
+
+      // Timestamp
+      if (aiData.timestamp) {
+        doc.text(`Analyse générée le: ${new Date(aiData.timestamp).toLocaleDateString('fr-FR')}`, 20, yPosition)
+        yPosition += 5
+      }
+
+      doc.setTextColor(0, 0, 0) // Reset color
     }
 
     // Informations de création
-    yPosition += 15
+    yPosition += 16
     doc.setFontSize(10)
     doc.setTextColor(100, 100, 100)
     doc.text(`Créé le: ${new Date(riskSheet.createdAt).toLocaleDateString('fr-FR')}`, 20, yPosition)
@@ -273,6 +364,140 @@ export class PDFService {
 
     // Télécharger le PDF
     const fileName = `Fiche_Risque_${riskSheet.target.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
+    doc.save(fileName)
+  }
+
+  /**
+   * Générer un rapport consolidé pour plusieurs fiches de risques
+   */
+  static async generateConsolidatedRiskReport(riskSheets: RiskSheet[]): Promise<void> {
+    const doc = new jsPDF()
+    let yPosition = 35
+
+    // En-tête
+    this.addHeader(doc, 'Rapport Consolidé des Risques')
+
+    // Résumé exécutif
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Résumé Exécutif', 20, yPosition)
+    yPosition += 15
+
+    // Statistiques générales
+    const totalRisks = riskSheets.length
+    const criticalRisks = riskSheets.filter(r => r.priority === 'CRITICAL').length
+    const highRisks = riskSheets.filter(r => r.priority === 'HIGH').length
+    const risksWithAI = riskSheets.filter(r => r.aiSuggestions).length
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Total des risques analysés: ${totalRisks}`, 20, yPosition)
+    yPosition += 8
+    doc.text(`Risques critiques: ${criticalRisks}`, 20, yPosition)
+    yPosition += 8
+    doc.text(`Risques élevés: ${highRisks}`, 20, yPosition)
+    yPosition += 8
+    doc.text(`Risques avec analyse IA: ${risksWithAI}`, 20, yPosition)
+    yPosition += 15
+
+    // Analyse IA consolidée
+    if (risksWithAI > 0) {
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Analyse IA Consolidée', 20, yPosition)
+      yPosition += 10
+
+      const avgConfidence = riskSheets
+        .filter(r => r.aiSuggestions?.confidence)
+        .reduce((sum, r) => sum + r.aiSuggestions.confidence, 0) / risksWithAI
+
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`Niveau de confiance moyen: ${Math.round(avgConfidence * 100)}%`, 20, yPosition)
+      yPosition += 8
+
+      // Recommandations les plus fréquentes
+      const allRecommendations: string[] = []
+      riskSheets.forEach(risk => {
+        if (risk.aiSuggestions?.recommendations) {
+          allRecommendations.push(...risk.aiSuggestions.recommendations)
+        }
+      })
+
+      if (allRecommendations.length > 0) {
+        doc.setFont('helvetica', 'bold')
+        doc.text('Recommandations principales:', 20, yPosition)
+        yPosition += 6
+        doc.setFont('helvetica', 'normal')
+
+        // Prendre les 5 premières recommandations uniques
+        const uniqueRecommendations = [...new Set(allRecommendations)].slice(0, 5)
+        uniqueRecommendations.forEach(rec => {
+          const recLines = doc.splitTextToSize(`• ${rec}`, 160)
+          doc.text(recLines, 25, yPosition)
+          yPosition += recLines.length * 4 + 2
+        })
+        yPosition += 10
+      }
+    }
+
+    // Nouvelle page pour les détails
+    doc.addPage()
+    yPosition = 35
+
+    // Liste détaillée des risques
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Détail des Risques', 20, yPosition)
+    yPosition += 15
+
+    riskSheets.forEach((risk, index) => {
+      if (yPosition > 250) {
+        doc.addPage()
+        yPosition = 35
+      }
+
+      // Titre du risque
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`${index + 1}. ${risk.target}`, 20, yPosition)
+      yPosition += 8
+
+      // Score et priorité
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`Score: ${Math.round(risk.riskScore)}/100 | Priorité: ${risk.priority}`, 25, yPosition)
+      yPosition += 6
+
+      // Scénario (tronqué)
+      const scenarioShort = risk.scenario.length > 100
+        ? risk.scenario.substring(0, 100) + '...'
+        : risk.scenario
+      const scenarioLines = doc.splitTextToSize(scenarioShort, 160)
+      doc.text(scenarioLines, 25, yPosition)
+      yPosition += scenarioLines.length * 4 + 3
+
+      // Analyse IA résumée
+      if (risk.aiSuggestions) {
+        doc.setFont('helvetica', 'bold')
+        doc.text('IA:', 25, yPosition)
+        doc.setFont('helvetica', 'normal')
+        const confidence = risk.aiSuggestions.confidence
+          ? `${Math.round(risk.aiSuggestions.confidence * 100)}%`
+          : 'N/A'
+        doc.text(`Confiance: ${confidence}`, 40, yPosition)
+        yPosition += 5
+      }
+
+      yPosition += 8
+    })
+
+    // Pied de page
+    this.addFooter(doc, 1, 2)
+
+    // Télécharger le PDF
+    const fileName = `Rapport_Consolide_Risques_${new Date().toISOString().split('T')[0]}.pdf`
     doc.save(fileName)
   }
 

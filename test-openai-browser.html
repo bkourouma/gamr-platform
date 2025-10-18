@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Integration Browser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 OpenAI Integration Browser Test</h1>
+        <p>This test verifies that the OpenAI integration works properly in the browser environment.</p>
+        
+        <div id="env-test" class="test-section">
+            <h3>📋 Environment Variables Test</h3>
+            <p>Checking if VITE_ prefixed environment variables are accessible...</p>
+            <button onclick="testEnvironmentVariables()">Test Environment Variables</button>
+            <div id="env-results"></div>
+        </div>
+
+        <div id="config-test" class="test-section">
+            <h3>⚙️ Configuration Test</h3>
+            <p>Testing AI configuration loading...</p>
+            <button onclick="testConfiguration()">Test Configuration</button>
+            <div id="config-results"></div>
+        </div>
+
+        <div id="openai-test" class="test-section">
+            <h3>🤖 OpenAI Service Test</h3>
+            <p>Testing OpenAI service initialization...</p>
+            <button onclick="testOpenAIService()">Test OpenAI Service</button>
+            <div id="openai-results"></div>
+        </div>
+
+        <div id="integration-test" class="test-section">
+            <h3>🔗 Integration Test</h3>
+            <p>Testing full integration with mock data...</p>
+            <button onclick="testFullIntegration()">Test Full Integration</button>
+            <div id="integration-results"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Test environment variables
+        window.testEnvironmentVariables = function() {
+            const results = document.getElementById('env-results');
+            results.innerHTML = '<p>Testing environment variables...</p>';
+            
+            try {
+                const envVars = {
+                    'VITE_OPENAI_API_KEY': import.meta.env.VITE_OPENAI_API_KEY,
+                    'VITE_OPENAI_MODEL': import.meta.env.VITE_OPENAI_MODEL,
+                    'VITE_ENABLE_AI_ANALYSIS': import.meta.env.VITE_ENABLE_AI_ANALYSIS,
+                    'VITE_MOCK_AI_RESPONSES': import.meta.env.VITE_MOCK_AI_RESPONSES
+                };
+                
+                let html = '<h4>Environment Variables:</h4><pre>';
+                let hasApiKey = false;
+                
+                for (const [key, value] of Object.entries(envVars)) {
+                    if (key === 'VITE_OPENAI_API_KEY') {
+                        const masked = value ? `${value.substring(0, 10)}...` : 'undefined';
+                        html += `${key}: ${masked}\n`;
+                        hasApiKey = !!value;
+                    } else {
+                        html += `${key}: ${value || 'undefined'}\n`;
+                    }
+                }
+                
+                html += '</pre>';
+                
+                if (hasApiKey) {
+                    html += '<div class="success">✅ API Key found (masked for security)</div>';
+                } else {
+                    html += '<div class="warning">⚠️ API Key not found - will use mock responses</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        };
+
+        // Test configuration
+        window.testConfiguration = async function() {
+            const results = document.getElementById('config-results');
+            results.innerHTML = '<p>Testing configuration...</p>';
+            
+            try {
+                // Import the AI config
+                const { getOpenAIConfig, isAIAnalysisEnabled } = await import('/src/lib/ai-config.ts');
+                
+                const config = getOpenAIConfig();
+                const isEnabled = isAIAnalysisEnabled();
+                
+                let html = '<h4>Configuration:</h4><pre>';
+                html += `API Key: ${config.apiKey ? 'Set (masked)' : 'Not set'}\n`;
+                html += `Model: ${config.model}\n`;
+                html += `Max Tokens: ${config.maxTokens}\n`;
+                html += `Temperature: ${config.temperature}\n`;
+                html += `AI Analysis Enabled: ${isEnabled}\n`;
+                html += '</pre>';
+                
+                if (config.apiKey) {
+                    html += '<div class="success">✅ Configuration loaded successfully</div>';
+                } else {
+                    html += '<div class="warning">⚠️ No API key configured - using mock mode</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        };
+
+        // Test OpenAI service
+        window.testOpenAIService = async function() {
+            const results = document.getElementById('openai-results');
+            results.innerHTML = '<p>Testing OpenAI service...</p>';
+            
+            try {
+                // Import the OpenAI service
+                const { OpenAIRiskAnalysisService } = await import('/src/lib/openai-risk-analysis.ts');
+                
+                const service = new OpenAIRiskAnalysisService();
+                
+                let html = '<h4>OpenAI Service:</h4>';
+                html += '<div class="success">✅ OpenAI service initialized successfully</div>';
+                
+                // Test connection (this will use mock if no API key)
+                html += '<p>Testing connection...</p>';
+                
+                try {
+                    const connectionTest = await service.testConnection();
+                    if (connectionTest.success) {
+                        html += '<div class="success">✅ Connection test passed</div>';
+                    } else {
+                        html += `<div class="warning">⚠️ Connection test failed: ${connectionTest.error}</div>`;
+                    }
+                } catch (connError) {
+                    html += `<div class="warning">⚠️ Connection test error: ${connError.message}</div>`;
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        };
+
+        // Test full integration
+        window.testFullIntegration = async function() {
+            const results = document.getElementById('integration-results');
+            results.innerHTML = '<p>Testing full integration...</p>';
+            
+            try {
+                // Import the enhanced risk analysis
+                const { generateAnalysisWithCitations } = await import('/src/lib/enhanced-risk-ai-analysis.ts');
+                
+                // Mock data for testing
+                const mockData = {
+                    target: 'Test Target',
+                    scenario: 'Test Scenario',
+                    evaluations: [],
+                    responses: []
+                };
+                
+                html = '<h4>Integration Test:</h4>';
+                html += '<div class="info">📝 Testing with mock data...</div>';
+                
+                const analysis = await generateAnalysisWithCitations(mockData);
+                
+                if (analysis) {
+                    html += '<div class="success">✅ Analysis generated successfully</div>';
+                    html += '<h5>Sample Analysis:</h5><pre>';
+                    html += `Probability: ${analysis.probability?.score || 'N/A'}\n`;
+                    html += `Vulnerability: ${analysis.vulnerability?.score || 'N/A'}\n`;
+                    html += `Impact: ${analysis.impact?.score || 'N/A'}\n`;
+                    html += `Quality: ${analysis.reasoningQuality || 'N/A'}\n`;
+                    html += '</pre>';
+                } else {
+                    html += '<div class="warning">⚠️ Analysis returned null</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        };
+
+        // Auto-run environment test on load
+        document.addEventListener('DOMContentLoaded', function() {
+            testEnvironmentVariables();
+        });
+    </script>
+</body>
+</html>

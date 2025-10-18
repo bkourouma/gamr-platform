@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { translatePriority, calculateRiskScore, getPriorityFromScore } from '../lib/utils'
 import { riskSheetsApi, handleApiError, type RiskSheet } from '../lib/api'
+import { useConfirmDialog } from '../components/ConfirmDialog'
+import { useToast, createSuccessToast, createErrorToast } from '../components/Toast'
 import { ReportGenerator } from '../components/ReportGenerator'
 import { PDFService } from '../lib/pdfService'
 import {
@@ -23,6 +25,8 @@ import {
 
 export const RiskSheets: React.FC = () => {
   const navigate = useNavigate()
+  const { openDialog, confirmDialog } = useConfirmDialog()
+  const { addToast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [riskSheets, setRiskSheets] = useState<RiskSheet[]>([])
@@ -84,17 +88,23 @@ export const RiskSheets: React.FC = () => {
   }
 
   const handleDeleteRisk = async (riskId: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette fiche de risque ?')) {
-      try {
-        await riskSheetsApi.delete(riskId)
-        // Recharger la liste après suppression
-        await loadRiskSheets()
-        alert('Fiche supprimée avec succès')
-      } catch (error) {
-        console.error('Erreur lors de la suppression:', error)
-        alert(`Erreur lors de la suppression: ${handleApiError(error)}`)
+    openDialog({
+      title: 'Supprimer la fiche de risque',
+      message: 'Êtes-vous sûr de vouloir supprimer cette fiche de risque ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          await riskSheetsApi.delete(riskId)
+          await loadRiskSheets()
+          addToast(createSuccessToast('Fiche supprimée', 'La fiche de risque a été supprimée avec succès.'))
+        } catch (error) {
+          console.error('Erreur lors de la suppression:', error)
+          addToast(createErrorToast('Erreur de suppression', handleApiError(error)))
+        }
       }
-    }
+    })
   }
 
   const toggleFilters = () => {
@@ -117,14 +127,14 @@ export const RiskSheets: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Fiches de risques</h1>
+            <h1 className="text-2xl font-bold text-gray-900">GAMR</h1>
             <p className="text-gray-600">Gestion et suivi de vos analyses GAMR</p>
           </div>
         </div>
         <Card>
           <CardContent className="p-12 text-center">
             <Loader2 className="w-8 h-8 text-primary-600 mx-auto mb-4 animate-spin" />
-            <p className="text-gray-600">Chargement des fiches de risque...</p>
+            <p className="text-gray-600">Chargement des GAMR...</p>
           </CardContent>
         </Card>
       </div>
@@ -137,7 +147,7 @@ export const RiskSheets: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Fiches de risques</h1>
+            <h1 className="text-2xl font-bold text-gray-900">GAMR</h1>
             <p className="text-gray-600">Gestion et suivi de vos analyses GAMR</p>
           </div>
         </div>
@@ -160,7 +170,7 @@ export const RiskSheets: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Fiches de risques</h1>
+          <h1 className="text-2xl font-bold text-gray-900">GAMR</h1>
           <p className="text-gray-600">Gestion et suivi de vos analyses GAMR</p>
         </div>
         <div className="flex space-x-3">
@@ -259,6 +269,9 @@ export const RiskSheets: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Confirm dialog mount point */}
+      {confirmDialog}
 
       {/* Risk Sheets List */}
       <div className="space-y-4">

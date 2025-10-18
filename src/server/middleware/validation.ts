@@ -41,6 +41,28 @@ export const validateRiskSheet = (req: any, res: any, next: any) => {
     errors.push('La catégorie doit être une chaîne de caractères')
   }
 
+  // Validation des recommandations IA (optionnelles)
+  if (req.body.aiSuggestions) {
+    if (typeof req.body.aiSuggestions !== 'object') {
+      errors.push('Les suggestions IA doivent être un objet')
+    } else {
+      // Validation de la structure des recommandations IA
+      const aiSuggestions = req.body.aiSuggestions
+
+      if (aiSuggestions.recommendations && !Array.isArray(aiSuggestions.recommendations)) {
+        errors.push('Les recommandations IA doivent être un tableau')
+      }
+
+      if (aiSuggestions.confidence && (typeof aiSuggestions.confidence !== 'number' || aiSuggestions.confidence < 0 || aiSuggestions.confidence > 1)) {
+        errors.push('La confiance IA doit être un nombre entre 0 et 1')
+      }
+
+      if (aiSuggestions.analysis && typeof aiSuggestions.analysis !== 'object') {
+        errors.push('L\'analyse IA doit être un objet')
+      }
+    }
+  }
+
   if (errors.length > 0) {
     return res.status(400).json({
       error: 'Données invalides',

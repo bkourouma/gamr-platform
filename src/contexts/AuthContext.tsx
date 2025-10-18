@@ -12,6 +12,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const isJwtExpired = (token: string): boolean => {
+    try {
+      const [, payloadBase64] = token.split('.')
+      const payload = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')))
+      if (!payload || !payload.exp) return true
+      const nowSeconds = Math.floor(Date.now() / 1000)
+      return payload.exp <= nowSeconds
+    } catch {
+      return true
+    }
+  }
+
   // Check for existing session on mount
   useEffect(() => {
     const checkExistingSession = () => {
@@ -19,7 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const storedUser = localStorage.getItem('gamr_user')
         const storedToken = localStorage.getItem('gamr_token')
         
-        if (storedUser && storedToken) {
+        if (storedUser && storedToken && !isJwtExpired(storedToken)) {
           const userData = JSON.parse(storedUser)
 
           // Configurer le token dans l'apiClient
@@ -35,6 +47,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.removeItem('gamr_token')
             apiClient.clearToken()
           }
+        } else {
+          localStorage.removeItem('gamr_user')
+          localStorage.removeItem('gamr_token')
+          apiClient.clearToken()
         }
       } catch (error) {
         console.error('Error checking existing session:', error)
@@ -57,6 +73,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await authApi.login(email, password)
 
       if (result.user && result.token) {
+        if (isJwtExpired(result.token)) {
+          return { success: false, error: 'Jeton expiré. Veuillez réessayer.' }
+        }
         // Store user data and token
         localStorage.setItem('gamr_user', JSON.stringify(result.user))
         localStorage.setItem('gamr_token', result.token)

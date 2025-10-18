@@ -33,6 +33,7 @@ import {
 import { Button } from './ui/Button'
 import { NotificationPanel } from './NotificationPanel'
 import { useNotifications } from '../hooks/useNotifications'
+import logoGamr from '../assets/logo_gamr.png'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -126,7 +127,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       description: 'Modèles GAMR standardisés'
     },
     {
-      name: 'Évaluations de Sécurité',
+      name: 'Questionnaire',
       href: '/evaluations',
       icon: FileSearch,
       gradient: 'from-blue-500 to-blue-600',
@@ -134,7 +135,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       badge: '1'
     },
     {
-      name: 'Fiches de Risques',
+      name: 'GAMR',
       href: '/risks',
       icon: AlertTriangle,
       gradient: 'from-orange-500 to-orange-600',
@@ -142,7 +143,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       badge: '2'
     },
     {
-      name: 'Actions Correctives',
+      name: 'Priorités d\'action',
       href: '/actions',
       icon: Target,
       gradient: 'from-green-500 to-green-600',
@@ -221,7 +222,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center justify-between h-16 px-6 border-b border-white/10">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Shield className="w-8 h-8 text-primary-600" />
+                <img
+                  src={logoGamr}
+                  alt="GAMR Logo"
+                  className="w-20 h-10 object-contain"
+                />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-accent-400 to-accent-500 rounded-full animate-pulse-soft"></div>
               </div>
               <div>

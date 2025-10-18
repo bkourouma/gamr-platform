@@ -19,6 +19,7 @@ import { evaluationsApi, handleApiError, type Evaluation } from '../lib/api'
 import { ConfirmDialog, useConfirmDialog } from '../components/ConfirmDialog'
 import { useToast, createSuccessToast, createErrorToast } from '../components/Toast'
 import { pdfExportService } from '../lib/pdfExport'
+import { EvaluationDataDebug } from '../components/EvaluationDataDebug'
 
 export const EvaluationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -443,7 +444,7 @@ export const EvaluationDetail: React.FC = () => {
                       <div className="bg-primary-50 border-b border-primary-200 px-6 py-4">
                         <h3 className="text-lg font-semibold text-primary-900 flex items-center">
                           <span className="bg-primary-100 text-primary-800 text-sm font-medium px-2 py-1 rounded-full mr-3">
-                            Groupe {groupIndex + 1}
+                            Ligne de défense {groupIndex + 1}
                           </span>
                           {group.title}
                         </h3>
@@ -649,6 +650,11 @@ export const EvaluationDetail: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Debug component - temporary */}
+      {evaluation && (
+        <EvaluationDataDebug evaluation={evaluation} />
+      )}
 
       {/* Dialog de confirmation */}
       {confirmDialog}

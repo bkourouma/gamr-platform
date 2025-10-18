@@ -201,6 +201,7 @@ router.put('/:id', requireAdminRole, async (req: any, res: any) => {
     if (description !== undefined) updateData.description = description
     if (version) updateData.version = version
     if (typeof isActive === 'boolean') updateData.isActive = isActive
+    // ouiMeansPositive is now handled at question level
 
     const updatedTemplate = await prisma.evaluationTemplate.update({
       where: { id },
@@ -290,8 +291,8 @@ router.put('/:id/questionGroups', requireAdminRole, async (req: any, res: any) =
                     helpText: question.helpText,
                     placeholder: question.placeholder,
                     weight: question.weight || 1.0,
-                    options: question.options,
                     dependsOn: question.dependsOn,
+                    ouiMeansPositive: question.ouiMeansPositive !== false,
                     objectiveId: createdObjective.id
                   }
                 })

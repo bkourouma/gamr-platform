@@ -3,11 +3,33 @@ const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+
+// Load environment variables from .env.local
+function loadEnvFile() {
+  try {
+    const envContent = fs.readFileSync('.env.local', 'utf8');
+    const lines = envContent.split('\n');
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const [key, ...valueParts] = trimmed.split('=');
+        if (key && valueParts.length > 0) {
+          process.env[key] = valueParts.join('=');
+        }
+      }
+    });
+  } catch (error) {
+    console.log('No .env.local file found, using defaults');
+  }
+}
+
+loadEnvFile();
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = 3002;
-const JWT_SECRET = 'your-super-secret-jwt-key-change-in-production-2024';
+const PORT = process.env.PORT || 3003;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-jwt-secret-change-in-production';
 
 // Middleware
 app.use(cors({

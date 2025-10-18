@@ -12,12 +12,12 @@ export class NotificationService {
     try {
       const notification = await prisma.notification.create({
         data: {
-          type: data.type,
+          type: data.type as any,
           title: data.title,
           message: data.message,
           tenantId: data.tenantId,
           userId: data.userId,
-          metadata: data.metadata || {},
+          // metadata: data.metadata || {},
           isRead: false
         }
       })

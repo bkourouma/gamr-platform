@@ -395,7 +395,8 @@ router.put('/:id', async (req, res) => {
 })
 
 // DELETE /api/actions/:id - Supprimer une action
-router.delete('/:id', requireRole(['ADMIN', 'AI_ANALYST']), async (req, res) => {
+// Autoriser aussi les évaluateurs à supprimer des actions liées aux risques
+router.delete('/:id', requireRole(['ADMIN', 'AI_ANALYST', 'EVALUATOR']), async (req, res) => {
   try {
     const { id } = req.params
     const { tenantId } = req.user!

@@ -104,13 +104,26 @@ export const useNotifications = () => {
     loadUnreadCount()
   }, [loadUnreadCount])
 
-  // Polling pour les mises à jour en temps réel (toutes les 30 secondes)
+  // Polling pour les mises à jour en temps réel avec backoff simple
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadUnreadCount()
-    }, 30000)
+    let intervalMs = 30000
+    let timer: any
 
-    return () => clearInterval(interval)
+    const poll = async () => {
+      try {
+        await loadUnreadCount()
+        // success: reset interval if it was increased
+        intervalMs = 30000
+      } catch (err: any) {
+        // If we hit rate limit, back off progressively up to 2 minutes
+        intervalMs = Math.min(intervalMs * 2, 120000)
+      } finally {
+        timer = setTimeout(poll, intervalMs)
+      }
+    }
+
+    timer = setTimeout(poll, intervalMs)
+    return () => clearTimeout(timer)
   }, [loadUnreadCount])
 
   return {

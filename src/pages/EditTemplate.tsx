@@ -23,6 +23,7 @@ interface TemplateFormData {
   description: string
   version: string
   isActive: boolean
+  ouiMeansPositive: boolean
 }
 
 export const EditTemplate: React.FC = () => {
@@ -35,7 +36,8 @@ export const EditTemplate: React.FC = () => {
     name: '',
     description: '',
     version: '',
-    isActive: true
+    isActive: true,
+    ouiMeansPositive: true
   })
   
   const [activeTab, setActiveTab] = useState<'info' | 'questionnaire'>('info')
@@ -58,7 +60,8 @@ export const EditTemplate: React.FC = () => {
         name: templateData.name,
         description: templateData.description || '',
         version: templateData.version,
-        isActive: templateData.isActive
+        isActive: templateData.isActive,
+        ouiMeansPositive: templateData.ouiMeansPositive !== false
       })
     } catch (error) {
       console.error('Erreur lors du chargement du template:', error)
@@ -111,7 +114,8 @@ export const EditTemplate: React.FC = () => {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         version: formData.version.trim(),
-        isActive: formData.isActive
+        isActive: formData.isActive,
+        ouiMeansPositive: formData.ouiMeansPositive
       })
 
       addToast(createSuccessToast('Informations sauvegardées avec succès'))
@@ -128,7 +132,7 @@ export const EditTemplate: React.FC = () => {
     if (!template) return
 
     try {
-      console.log('Sauvegarde des groupes de questions:', questionGroups)
+      console.log('Sauvegarde des lignes de défense:', questionGroups)
 
       await templatesApi.updateQuestionGroups(template.id, questionGroups)
 
@@ -317,6 +321,23 @@ export const EditTemplate: React.FC = () => {
                 </p>
               </div>
 
+              <div>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.ouiMeansPositive}
+                    onChange={(e) => handleInputChange('ouiMeansPositive', e.target.checked)}
+                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Oui = positif (protection/atténuation)
+                  </span>
+                </label>
+                <p className="text-xs text-gray-600 mt-1">
+                  Décochez si, pour ce modèle, une réponse "Oui" doit être considérée comme négative (exposition/aggravation).
+                </p>
+              </div>
+
               <div className="flex justify-end">
                 <Button
                   onClick={handleSaveInfo}
@@ -348,7 +369,7 @@ export const EditTemplate: React.FC = () => {
                     <FileText className="w-6 h-6 text-white" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Groupes</p>
+                    <p className="text-sm font-medium text-gray-600">Lignes de défense</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {template.questionGroups?.length || 0}
                     </p>

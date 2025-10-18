@@ -1,3 +1,13 @@
+node_modules/
+dist/
+dist-server/
+*.log
+logs/
+data/
+prisma/*.db
+app-logs.zip
+.DS_Store
+*.env
 # Logs
 logs
 *.log
@@ -36,3 +46,11 @@ azure/cost-estimation.txt
 .env.development.local
 .env.test.local
 .env.production.local
+.clinerules/byterover-rules.md
+.kilocode/rules/byterover-rules.md
+.roo/rules/byterover-rules.md
+.windsurf/rules/byterover-rules.md
+.cursor/rules/byterover-rules.mdc
+.kiro/steering/byterover-rules.md
+.qoder/rules/byterover-rules.md
+.augment/rules/byterover-rules.md

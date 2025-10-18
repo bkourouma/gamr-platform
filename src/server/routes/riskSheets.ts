@@ -124,7 +124,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', validateRiskSheet, async (req, res) => {
   try {
     const { tenantId, id: authorId } = req.user
-    const { target, scenario, probability, vulnerability, impact, category } = req.body
+    const { target, scenario, probability, vulnerability, impact, category, aiSuggestions } = req.body
 
     // Calcul automatique du score et de la priorité
     const riskScore = calculateRiskScore(probability, vulnerability, impact)
@@ -140,6 +140,7 @@ router.post('/', validateRiskSheet, async (req, res) => {
         riskScore,
         priority,
         category,
+        aiSuggestions: aiSuggestions || null, // Sauvegarder les recommandations IA
         tenantId,
         authorId,
         reviewDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // +90 jours
@@ -168,7 +169,7 @@ router.put('/:id', validateRiskSheet, async (req, res) => {
   try {
     const { id } = req.params
     const { tenantId } = req.user
-    const { target, scenario, probability, vulnerability, impact, category } = req.body
+    const { target, scenario, probability, vulnerability, impact, category, aiSuggestions } = req.body
 
     // Vérifier que la fiche existe et appartient au tenant
     const existingRiskSheet = await prisma.riskSheet.findFirst({
@@ -198,6 +199,7 @@ router.put('/:id', validateRiskSheet, async (req, res) => {
         riskScore,
         priority,
         category,
+        aiSuggestions: aiSuggestions !== undefined ? aiSuggestions : existingRiskSheet.aiSuggestions, // Préserver les recommandations IA existantes si non fournies
         version: existingRiskSheet.version + 1
       },
       include: {
@@ -261,7 +263,8 @@ router.get('/stats/dashboard', async (req, res) => {
       criticalRisks,
       highRisks,
       recentRisks,
-      risksByCategory
+      risksByCategory,
+      averageAggregation
     ] = await Promise.all([
       prisma.riskSheet.count({
         where: { tenantId, isArchived: false }
@@ -285,6 +288,10 @@ router.get('/stats/dashboard', async (req, res) => {
         by: ['category'],
         where: { tenantId, isArchived: false },
         _count: true
+      }),
+      prisma.riskSheet.aggregate({
+        where: { tenantId, isArchived: false },
+        _avg: { riskScore: true }
       })
     ])
 
@@ -296,7 +303,8 @@ router.get('/stats/dashboard', async (req, res) => {
       risksByCategory: risksByCategory.map(item => ({
         category: item.category,
         count: item._count
-      }))
+      })),
+      averageRiskScore: Math.round(((averageAggregation._avg.riskScore || 0)) * 10) / 10
     })
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques:', error)

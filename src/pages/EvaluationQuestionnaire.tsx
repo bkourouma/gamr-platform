@@ -24,6 +24,14 @@ export const EvaluationQuestionnaire: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [autoSaveTimeout, setAutoSaveTimeout] = useState<NodeJS.Timeout | null>(null)
   const [localResponses, setLocalResponses] = useState<Map<string, any>>(new Map())
+  const [showOnlyUnanswered, setShowOnlyUnanswered] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('gamr_show_only_unanswered')
+      return saved ? saved === 'true' : false
+    } catch {
+      return false
+    }
+  })
 
   useEffect(() => {
     if (id) {
@@ -75,6 +83,55 @@ export const EvaluationQuestionnaire: React.FC = () => {
         return objective.questions[currentQuestionIndex - questionIndex]
       }
       questionIndex += objective.questions.length
+    }
+    return null
+  }
+
+  const getQuestionByIndices = (groupIndex: number, questionIndexInGroup: number): Question | null => {
+    const group = evaluation?.template?.questionGroups?.[groupIndex]
+    if (!group?.objectives) return null
+    let idx = 0
+    for (const objective of group.objectives) {
+      if (!objective.questions) continue
+      for (const q of objective.questions) {
+        if (idx === questionIndexInGroup) return q
+        idx += 1
+      }
+    }
+    return null
+  }
+
+  const isQuestionAnswered = (question: Question | null): boolean => {
+    if (!question) return false
+    return responses.has(question.id)
+  }
+
+  const findNextIndices = (startGroup: number, startQuestion: number, onlyUnanswered: boolean): { gi: number; qi: number } | null => {
+    const groups = evaluation?.template?.questionGroups || []
+    for (let gi = startGroup; gi < groups.length; gi++) {
+      const group = groups[gi]
+      const totalInGroup = group?.objectives?.reduce((t, obj) => t + (obj.questions?.length || 0), 0) || 0
+      const startQi = gi === startGroup ? startQuestion + 1 : 0
+      for (let qi = startQi; qi < totalInGroup; qi++) {
+        if (!onlyUnanswered) return { gi, qi }
+        const q = getQuestionByIndices(gi, qi)
+        if (q && !isQuestionAnswered(q)) return { gi, qi }
+      }
+    }
+    return null
+  }
+
+  const findPrevIndices = (startGroup: number, startQuestion: number, onlyUnanswered: boolean): { gi: number; qi: number } | null => {
+    const groups = evaluation?.template?.questionGroups || []
+    for (let gi = startGroup; gi >= 0; gi--) {
+      const group = groups[gi]
+      const totalInGroup = group?.objectives?.reduce((t, obj) => t + (obj.questions?.length || 0), 0) || 0
+      const startQi = gi === startGroup ? startQuestion - 1 : totalInGroup - 1
+      for (let qi = startQi; qi >= 0; qi--) {
+        if (!onlyUnanswered) return { gi, qi }
+        const q = getQuestionByIndices(gi, qi)
+        if (q && !isQuestionAnswered(q)) return { gi, qi }
+      }
     }
     return null
   }
@@ -152,39 +209,26 @@ export const EvaluationQuestionnaire: React.FC = () => {
   }
 
   const nextQuestion = () => {
-    const group = getCurrentGroup()
-    if (!group?.objectives) return
-
-    const totalQuestionsInGroup = group.objectives.reduce((total, obj) => 
-      total + (obj.questions?.length || 0), 0
-    )
-
-    if (currentQuestionIndex < totalQuestionsInGroup - 1) {
-      setCurrentQuestionIndex(prev => prev + 1)
-    } else {
-      // Passer au groupe suivant
-      if (currentGroupIndex < (evaluation?.template?.questionGroups?.length || 0) - 1) {
-        setCurrentGroupIndex(prev => prev + 1)
-        setCurrentQuestionIndex(0)
-      }
+    const jump = findNextIndices(currentGroupIndex, currentQuestionIndex, showOnlyUnanswered)
+    if (jump) {
+      setCurrentGroupIndex(jump.gi)
+      setCurrentQuestionIndex(jump.qi)
     }
   }
 
   const previousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1)
-    } else {
-      // Revenir au groupe précédent
-      if (currentGroupIndex > 0) {
-        setCurrentGroupIndex(prev => prev - 1)
-        const prevGroup = evaluation?.template?.questionGroups?.[currentGroupIndex - 1]
-        if (prevGroup?.objectives) {
-          const totalQuestionsInPrevGroup = prevGroup.objectives.reduce((total, obj) => 
-            total + (obj.questions?.length || 0), 0
-          )
-          setCurrentQuestionIndex(totalQuestionsInPrevGroup - 1)
-        }
-      }
+    const jump = findPrevIndices(currentGroupIndex, currentQuestionIndex, showOnlyUnanswered)
+    if (jump) {
+      setCurrentGroupIndex(jump.gi)
+      setCurrentQuestionIndex(jump.qi)
+    }
+  }
+
+  const jumpToFirstUnanswered = () => {
+    const jump = findNextIndices(0, -1, true)
+    if (jump) {
+      setCurrentGroupIndex(jump.gi)
+      setCurrentQuestionIndex(jump.qi)
     }
   }
 
@@ -399,6 +443,18 @@ export const EvaluationQuestionnaire: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-4">
+          <label className="flex items-center space-x-2 text-sm text-gray-700 select-none">
+            <input
+              type="checkbox"
+              checked={showOnlyUnanswered}
+              onChange={(e) => {
+                const value = e.target.checked
+                setShowOnlyUnanswered(value)
+                try { localStorage.setItem('gamr_show_only_unanswered', value ? 'true' : 'false') } catch {}
+              }}
+            />
+            <span>Afficher uniquement les non répondues</span>
+          </label>
           {saving && (
             <div className="flex items-center space-x-2 text-blue-600">
               <Clock className="w-4 h-4 animate-spin" />
@@ -464,6 +520,12 @@ export const EvaluationQuestionnaire: React.FC = () => {
         </button>
 
         <div className="flex space-x-3">
+          <button
+            onClick={jumpToFirstUnanswered}
+            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Aller à la première non répondue
+          </button>
           <button
             onClick={async () => {
               await saveAllPendingResponses()

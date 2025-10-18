@@ -12,15 +12,28 @@ export const CreateRiskSheet: React.FC = () => {
     setIsLoading(true)
 
     try {
-      // Créer la fiche via l'API
-      const newRisk = await riskSheetsApi.create({
+      // Préparer les données avec les recommandations IA
+      const riskData: any = {
         target: data.target,
         scenario: data.scenario,
         probability: data.probability,
         vulnerability: data.vulnerability,
-        impact: data.impact,
-        category: data.category
-      })
+        impact: data.impact
+      }
+
+      // Ajouter les recommandations IA si disponibles
+      if (data.aiAnalysis) {
+        riskData.aiSuggestions = {
+          analysis: data.aiAnalysis,
+          recommendations: data.aiAnalysis.overallAssessment ? [data.aiAnalysis.overallAssessment] : [],
+          confidence: data.aiAnalysis.confidenceLevel || 0.8,
+          timestamp: new Date().toISOString(),
+          basedOnEvaluations: data.aiAnalysis.basedOnEvaluations || []
+        }
+      }
+
+      // Créer la fiche via l'API
+      const newRisk = await riskSheetsApi.create(riskData)
 
       console.log('Fiche sauvegardée avec succès:', newRisk)
 

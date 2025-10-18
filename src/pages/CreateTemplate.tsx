@@ -23,6 +23,7 @@ interface TemplateFormData {
   version: string
   targetSectors: string[]
   companySize: string[]
+  ouiMeansPositive: boolean
 }
 
 const AVAILABLE_SECTORS = [
@@ -54,7 +55,8 @@ export const CreateTemplate: React.FC = () => {
     description: '',
     version: '1.0',
     targetSectors: [],
-    companySize: []
+    companySize: [],
+    ouiMeansPositive: true
   })
   
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -122,6 +124,7 @@ export const CreateTemplate: React.FC = () => {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         version: formData.version.trim(),
+        ouiMeansPositive: formData.ouiMeansPositive,
         questionGroups: [] // Sera configuré dans l'éditeur
       })
 

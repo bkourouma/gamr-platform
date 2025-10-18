@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Variables Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .env-var {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Environment Variables Test</h1>
+    <div id="results"></div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+        
+        const envVars = {
+            'VITE_API_URL': import.meta.env.VITE_API_URL,
+            'VITE_OPENAI_API_KEY': import.meta.env.VITE_OPENAI_API_KEY ? 'Set (masked)' : 'Not set',
+            'VITE_ENABLE_AI_ANALYSIS': import.meta.env.VITE_ENABLE_AI_ANALYSIS,
+            'VITE_MOCK_AI_RESPONSES': import.meta.env.VITE_MOCK_AI_RESPONSES
+        };
+        
+        let html = '<h2>Current Environment Variables:</h2>';
+        
+        for (const [key, value] of Object.entries(envVars)) {
+            const className = value ? 'success' : 'error';
+            html += `<div class="env-var ${className}"><strong>${key}:</strong> ${value || 'undefined'}</div>`;
+        }
+        
+        // Test API URL construction
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+        html += `<h2>API Configuration:</h2>`;
+        html += `<div class="env-var success"><strong>API Base URL:</strong> ${apiBaseUrl}</div>`;
+        html += `<div class="env-var success"><strong>Login URL:</strong> ${apiBaseUrl}/auth/login</div>`;
+        
+        results.innerHTML = html;
+    </script>
+</body>
+</html>

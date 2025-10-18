@@ -5,19 +5,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Calcul du score de risque GAMR (normalisé sur 100)
+// Calcul du score de risque GAMR (formule classique)
 export function calculateRiskScore(probability: number, vulnerability: number, impact: number): number {
+  // Formule classique sans normalisation: P × V × I
   // Score maximum possible: 3 × 4 × 5 = 60
-  // Normalisation: (score / 60) × 100 pour obtenir un pourcentage sur 100
-  return Math.round((probability * vulnerability * impact) / 60 * 100)
+  return probability * vulnerability * impact
 }
 
 // Détermination de la priorité basée sur le score
 export function getPriorityFromScore(score: number): 'VERY_LOW' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' {
-  if (score >= 80) return 'CRITICAL'
-  if (score >= 60) return 'HIGH'
-  if (score >= 40) return 'MEDIUM'
-  if (score >= 20) return 'LOW'
+  // Seuils alignés sur l'échelle 1–60 (équivalents de 20/40/60/80%):
+  // 12, 24, 36, 48
+  if (score >= 48) return 'CRITICAL'
+  if (score >= 36) return 'HIGH'
+  if (score >= 24) return 'MEDIUM'
+  if (score >= 12) return 'LOW'
   return 'VERY_LOW'
 }
 

@@ -119,6 +119,19 @@ export default {
         'bounce-gentle': 'bounceGentle 0.6s ease-out',
         'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
+        'security-pulse': 'securityPulse 2s ease-in-out infinite',
+        'security-glow': 'securityGlow 3s ease-in-out infinite alternate',
+        'security-blink': 'securityBlink 1.5s ease-in-out infinite',
+        'rainbow-border': 'rainbowBorder 2s linear infinite',
+        'value-bounce': 'valueBounce 1s ease-in-out infinite alternate',
+        'icon-spin-glow': 'iconSpinGlow 3s linear infinite',
+        'shimmer-effect': 'shimmerEffect 2s infinite',
+        'number-pulse': 'numberPulse 1.5s ease-in-out infinite',
+        'number-glow': 'numberGlow 2s ease-in-out infinite alternate',
+        'number-color-cycle': 'numberColorCycle 4s linear infinite',
+        'number-bounce': 'numberBounce 0.8s ease-in-out infinite alternate',
+        'number-scale': 'numberScale 2s ease-in-out infinite',
+        'rainbow-text': 'rainbowText 3s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -150,6 +163,62 @@ export default {
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
+        },
+        securityPulse: {
+          '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' },
+          '50%': { transform: 'scale(1.02)', boxShadow: '0 0 30px rgba(16, 185, 129, 0.6)' },
+        },
+        securityGlow: {
+          '0%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' },
+          '100%': { boxShadow: '0 0 40px rgba(16, 185, 129, 0.8), 0 0 60px rgba(16, 185, 129, 0.4)' },
+        },
+        securityBlink: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
+        rainbowBorder: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+        valueBounce: {
+          '0%': { transform: 'translateY(0px)' },
+          '100%': { transform: 'translateY(-4px)' },
+        },
+        iconSpinGlow: {
+          '0%': { transform: 'rotate(0deg)', filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.5))' },
+          '100%': { transform: 'rotate(360deg)', filter: 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.8))' },
+        },
+        shimmerEffect: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        numberPulse: {
+          '0%, 100%': { transform: 'scale(1)', textShadow: '0 0 10px rgba(16, 185, 129, 0.5)' },
+          '50%': { transform: 'scale(1.1)', textShadow: '0 0 20px rgba(16, 185, 129, 0.8)' },
+        },
+        numberGlow: {
+          '0%': { textShadow: '0 0 10px rgba(16, 185, 129, 0.5)' },
+          '100%': { textShadow: '0 0 30px rgba(16, 185, 129, 1), 0 0 40px rgba(16, 185, 129, 0.8)' },
+        },
+        numberColorCycle: {
+          '0%': { filter: 'hue-rotate(0deg)' },
+          '100%': { filter: 'hue-rotate(360deg)' },
+        },
+        numberBounce: {
+          '0%': { transform: 'translateY(0px) rotate(-2deg)' },
+          '100%': { transform: 'translateY(-8px) rotate(2deg)' },
+        },
+        numberScale: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '25%': { transform: 'scale(1.05)' },
+          '50%': { transform: 'scale(1.1)' },
+          '75%': { transform: 'scale(1.05)' },
+        },
+        rainbowText: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
         },
       },
       backdropBlur: {

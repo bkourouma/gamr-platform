@@ -4,13 +4,14 @@ import { Button } from '../components/ui/Button'
 import { ReportGenerator } from '../components/ReportGenerator'
 import { PDFService } from '../lib/pdfService'
 import { riskSheetsApi, actionsApi, evaluationsApi } from '../lib/api'
+import { WordService } from '../lib/wordService'
 import { useToast } from '../components/Toast'
 
 export const ReportsPage: React.FC = () => {
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const { showToast } = useToast()
+  const { addToast } = useToast()
 
   useEffect(() => {
     loadStats()
@@ -53,19 +54,37 @@ export const ReportsPage: React.FC = () => {
               riskSheets: response.data,
               title: 'Résumé des Risques - ' + new Date().toLocaleDateString('fr-FR')
             })
-            showToast('Rapport généré avec succès', 'success')
+            addToast({ type: 'success', title: 'Rapport généré avec succès' })
           } else {
-            showToast('Aucune fiche de risque trouvée', 'warning')
+            addToast({ type: 'warning', title: 'Aucune fiche de risque trouvée' })
           }
         } catch (error) {
-          showToast('Erreur lors de la génération du rapport', 'error')
+          addToast({ type: 'error', title: 'Erreur lors de la génération du rapport' })
+        }
+      }
+    },
+    {
+      id: 'word-risk-actions',
+      title: 'DOCX — Risques & Actions',
+      description: 'Rapport Word avec statistiques et Recommandations IA',
+      icon: FileText,
+      color: 'from-indigo-500 to-indigo-600',
+      bgColor: 'bg-indigo-50',
+      action: async () => {
+        try {
+          await WordService.generateRiskActionReport({
+            title: `Rapport Risques & Actions — ${new Date().toLocaleDateString('fr-FR')}`,
+          })
+          addToast({ type: 'success', title: 'Rapport Word généré avec succès' })
+        } catch (error) {
+          addToast({ type: 'error', title: 'Erreur lors de la génération du rapport Word' })
         }
       }
     },
     {
       id: 'actions-tracking',
       title: 'Suivi des Actions',
-      description: 'Rapport détaillé des actions correctives et de leur avancement',
+      description: 'Rapport détaillé des priorités d\'action et de leur avancement',
       icon: Calendar,
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50',
@@ -73,13 +92,13 @@ export const ReportsPage: React.FC = () => {
         try {
           const response = await actionsApi.getAll({ limit: 100 })
           if (response.data.length > 0) {
-            await PDFService.generateActionsReport(response.data, 'Suivi des Actions Correctives')
-            showToast('Rapport généré avec succès', 'success')
+            await PDFService.generateActionsReport(response.data, 'Suivi des Priorités d\'action')
+            addToast({ type: 'success', title: 'Rapport généré avec succès' })
           } else {
-            showToast('Aucune action trouvée', 'warning')
+            addToast({ type: 'warning', title: 'Aucune action trouvée' })
           }
         } catch (error) {
-          showToast('Erreur lors de la génération du rapport', 'error')
+          addToast({ type: 'error', title: 'Erreur lors de la génération du rapport' })
         }
       }
     },
@@ -98,12 +117,12 @@ export const ReportsPage: React.FC = () => {
               riskSheets: response.data,
               title: 'Rapport des Risques Critiques'
             })
-            showToast('Rapport généré avec succès', 'success')
+            addToast({ type: 'success', title: 'Rapport généré avec succès' })
           } else {
-            showToast('Aucun risque critique trouvé', 'info')
+            addToast({ type: 'info', title: 'Aucun risque critique trouvé' })
           }
         } catch (error) {
-          showToast('Erreur lors de la génération du rapport', 'error')
+          addToast({ type: 'error', title: 'Erreur lors de la génération du rapport' })
         }
       }
     },
@@ -126,9 +145,9 @@ export const ReportsPage: React.FC = () => {
             actions: actionsResponse.data,
             title: `Rapport Mensuel - ${new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`
           })
-          showToast('Rapport mensuel généré avec succès', 'success')
+          addToast({ type: 'success', title: 'Rapport mensuel généré avec succès' })
         } catch (error) {
-          showToast('Erreur lors de la génération du rapport mensuel', 'error')
+          addToast({ type: 'error', title: 'Erreur lors de la génération du rapport mensuel' })
         }
       }
     }
@@ -143,7 +162,7 @@ export const ReportsPage: React.FC = () => {
       status: 'Généré'
     },
     {
-      name: 'Actions Correctives Q1',
+      name: 'Priorités d\'action Q1',
       type: 'Actions',
       date: '2024-01-10T14:15:00',
       size: '1.8 MB',
@@ -190,7 +209,7 @@ export const ReportsPage: React.FC = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Fiches de Risques</p>
+                <p className="text-sm font-medium text-gray-600">GAMR</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalRisks}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -202,7 +221,7 @@ export const ReportsPage: React.FC = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Actions Correctives</p>
+                <p className="text-sm font-medium text-gray-600">Priorités d'action</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalActions}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">

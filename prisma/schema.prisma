@@ -337,6 +337,11 @@ model Question {
   // Pondération pour le scoring
   weight      Float       @default(1.0)
 
+  // Interprétation des réponses Oui/Non au niveau de la question
+  // true  => "Oui" est positif (protection/atténuation)
+  // false => "Oui" est négatif (exposition/aggravation)
+  ouiMeansPositive Boolean @default(true)
+
   // Relations
   objectiveId String
   objective   Objective   @relation(fields: [objectiveId], references: [id], onDelete: Cascade)

@@ -209,7 +209,7 @@ export const Evaluations: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-gradient">Évaluations Sécuritaires</h1>
+          <h1 className="text-3xl font-bold text-gradient">Questionnaire</h1>
           <p className="text-gray-600 text-lg">
             Questionnaires d'évaluation pour {user?.tenant.name}
           </p>
@@ -217,7 +217,7 @@ export const Evaluations: React.FC = () => {
         <Link to="/evaluations/new">
           <Button variant="gradient" size="lg" className="btn-animated">
             <Plus className="w-5 h-5 mr-2" />
-            Nouvelle évaluation
+            Nouveau questionnaire
           </Button>
         </Link>
       </div>
@@ -241,7 +241,7 @@ export const Evaluations: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { 
-            label: 'Total évaluations', 
+            label: 'Total questionnaires',
             value: stats.total, 
             icon: FileText, 
             color: 'from-primary-500 to-primary-600' 
@@ -438,14 +438,14 @@ export const Evaluations: React.FC = () => {
         <Card variant="glass">
           <CardContent className="p-12 text-center">
             <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune évaluation trouvée</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun questionnaire trouvé</h3>
             <p className="text-gray-600 mb-4">
-              {searchTerm ? 'Aucune évaluation ne correspond à votre recherche.' : 'Commencez par créer votre première évaluation sécuritaire.'}
+              {searchTerm ? 'Aucun questionnaire ne correspond à votre recherche.' : 'Commencez par créer votre premier questionnaire.'}
             </p>
             <Link to="/evaluations/new">
               <Button variant="gradient">
                 <Plus className="w-4 h-4 mr-2" />
-                Créer une évaluation
+                Créer un questionnaire
               </Button>
             </Link>
           </CardContent>

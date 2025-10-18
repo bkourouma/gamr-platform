@@ -8,7 +8,6 @@ import {
   TrendingUp,
   AlertTriangle,
   Shield,
-  Users,
   Plus,
   BarChart3,
   Sparkles,
@@ -19,9 +18,35 @@ import {
   ArrowDownRight,
   Minus
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { riskSheetsApi } from '../lib/api'
 
 export const Dashboard: React.FC = () => {
+  const [averageRiskScore, setAverageRiskScore] = useState<number>(0)
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const s = await riskSheetsApi.getStats()
+        setAverageRiskScore(s.averageRiskScore || 0)
+      } catch (e) {
+        // ignore dashboard average errors for now
+      }
+    }
+    loadStats()
+  }, [])
+
   const stats = [
+    {
+      name: 'Indice Global de Sécurité',
+      value: `${averageRiskScore}`,
+      change: '0',
+      changeType: 'neutral',
+      icon: Shield,
+      gradient: 'from-success-500 to-success-600',
+      bgGradient: 'from-success-50 to-success-100',
+      description: 'Moyenne des notes de risque (1–60)'
+    },
     {
       name: 'Risques actifs',
       value: '24',
@@ -51,16 +76,6 @@ export const Dashboard: React.FC = () => {
       gradient: 'from-warning-500 to-warning-600',
       bgGradient: 'from-warning-50 to-warning-100',
       description: 'Mesures correctives actives'
-    },
-    {
-      name: 'Utilisateurs actifs',
-      value: '8',
-      change: '0',
-      changeType: 'neutral',
-      icon: Users,
-      gradient: 'from-success-500 to-success-600',
-      bgGradient: 'from-success-50 to-success-100',
-      description: 'Connectés cette semaine'
     }
   ]
 
@@ -168,19 +183,21 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const ChangeIcon = getChangeIcon(stat.changeType)
+          const isSecurityIndex = index === 0 // First stat is the security index
+          
           return (
             <Card
               key={stat.name}
               variant="glass"
-              className="group animate-slide-up"
+              className={`group animate-slide-up ${isSecurityIndex ? 'security-panel-flashy security-panel-border relative z-10' : ''}`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <CardContent className="p-6">
+              <CardContent className={`p-6 ${isSecurityIndex ? 'security-shimmer' : ''}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.bgGradient} group-hover:shadow-glow transition-all duration-300`}>
-                        <stat.icon className={`h-6 w-6 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`} />
+                      <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.bgGradient} ${isSecurityIndex ? 'security-panel-blink' : 'group-hover:shadow-glow'} transition-all duration-300`}>
+                        <stat.icon className={`h-6 w-6 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent ${isSecurityIndex ? 'security-icon-spin' : ''}`} />
                       </div>
                       {stat.change !== '0' && (
                         <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-semibold ${getChangeColor(stat.changeType)}`}>
@@ -191,18 +208,41 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <h3 className="text-sm font-medium text-gray-600 group-hover:text-gray-700 transition-colors">
+                      <h3 className={`text-sm font-medium text-gray-600 group-hover:text-gray-700 transition-colors ${isSecurityIndex ? 'security-panel-blink text-gradient font-bold' : ''}`}>
                         {stat.name}
                       </h3>
-                      <div className="text-3xl font-bold text-gray-900 group-hover:text-gradient transition-all duration-300">
-                        {stat.value}
+                      <div className={`text-3xl font-bold text-gray-900 group-hover:text-gradient transition-all duration-300 ${isSecurityIndex ? 'security-value-bounce text-gradient text-5xl security-number-flashy security-number-bounce security-number-rainbow relative' : ''}`}>
+                        {isSecurityIndex ? (
+                          <span className="security-number-scale inline-block">
+                            {stat.value}
+                          </span>
+                        ) : (
+                          stat.value
+                        )}
+                        
+                        {/* Extra effects for the number */}
+                        {isSecurityIndex && (
+                          <>
+                            <div className="absolute -inset-2 bg-gradient-to-r from-success-400/20 via-accent-400/20 to-primary-400/20 rounded-lg animate-pulse-soft blur-sm"></div>
+                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-success-400 to-accent-400 rounded-full animate-ping"></div>
+                          </>
+                        )}
                       </div>
-                      <p className="text-xs text-gray-500 leading-relaxed">
+                      <p className={`text-xs leading-relaxed ${isSecurityIndex ? 'text-success-700 font-semibold security-panel-blink' : 'text-gray-500'}`}>
                         {stat.description}
                       </p>
                     </div>
                   </div>
                 </div>
+                
+                {/* Extra flashy elements for security index */}
+                {isSecurityIndex && (
+                  <>
+                    <div className="absolute top-2 right-2 w-3 h-3 bg-gradient-to-r from-success-400 to-success-600 rounded-full animate-ping"></div>
+                    <div className="absolute bottom-2 left-2 w-2 h-2 bg-gradient-to-r from-accent-400 to-accent-600 rounded-full animate-bounce-gentle"></div>
+                    <div className="absolute top-1/2 right-1 w-1 h-8 bg-gradient-to-b from-transparent via-success-400 to-transparent animate-pulse-soft"></div>
+                  </>
+                )}
               </CardContent>
             </Card>
           )

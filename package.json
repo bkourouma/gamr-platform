@@ -10,8 +10,8 @@
     "server": "tsx src/server/index.ts",
     "server:dev": "tsx watch src/server/index.ts",
     "dev:full": "concurrently \"npm run server:dev\" \"npm run dev\"",
-    "start": "node dist/server/index.js",
-    "build:server": "tsc --project tsconfig.server.json",
+    "start": "tsx src/server/simple-index.ts",
+    "build:server": "tsc -p tsconfig.server.json",
     "build:full": "npm run build && npm run build:server",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed-questionnaire": "tsx prisma/seed-questionnaire.ts",
@@ -23,7 +23,9 @@
     "db:seed-models": "tsx prisma/seed-evaluation-models.ts",
     "db:seed-gold-mines": "tsx prisma/seed-gold-mines-evaluations.ts",
     "db:reset": "npx prisma db push --force-reset && npm run db:seed && npm run db:seed-questionnaire && npm run db:seed-simple && npm run db:seed-notifications && npm run db:seed-actions && npm run db:seed-correlations && npm run db:seed-models && npm run db:seed-gold-mines",
-    "db:deploy": "npx prisma db push && npm run db:seed && npm run db:seed-questionnaire && npm run db:seed-simple && npm run db:seed-notifications && npm run db:seed-actions && npm run db:seed-correlations && npm run db:seed-models && npm run db:seed-gold-mines"
+    "db:deploy": "npx prisma migrate deploy && npm run db:seed && npm run db:seed-questionnaire && npm run db:seed-simple && npm run db:seed-notifications && npm run db:seed-actions && npm run db:seed-correlations && npm run db:seed-models && npm run db:seed-gold-mines",
+    "import:questions": "tsx scripts/import-questions-from-csv.ts",
+    "rag:index": "tsx scripts/index-tenant.ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -35,7 +37,6 @@
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.2.0",
     "postcss": "^8.5.6",
-    "tsx": "^4.20.3",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   },
@@ -51,8 +52,10 @@
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
+    "docx": "^8.5.0",
     "express": "^4.18.2",
     "express-rate-limit": "^7.5.1",
+    "file-saver": "^2.0.5",
     "helmet": "^8.1.0",
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
@@ -68,6 +71,7 @@
     "recharts": "^3.0.2",
     "sqlite3": "^5.1.7",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.3"
   }
 }
