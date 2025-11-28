@@ -4,7 +4,7 @@ dist-server/
 *.log
 logs/
 data/
-prisma/*.db
+# prisma/*.db  # Commenté pour permettre l'inclusion des bases de données locales
 app-logs.zip
 .DS_Store
 *.env
