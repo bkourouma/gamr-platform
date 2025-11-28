@@ -21,6 +21,9 @@ param (
 $AppDir = "/opt/gamr"
 $CurrentDir = Get-Location
 
+# Nettoyer le domaine (retirer https:// et trailing slash)
+$Domain = $Domain -replace '^https?://', '' -replace '/$', ''
+
 Write-Host "🚀 Déploiement de GAMR Platform avec remplacement de la base de données" -ForegroundColor Cyan
 Write-Host "========================================================================"
 Write-Host "IP du VPS: $VpsIp"
@@ -30,7 +33,7 @@ Write-Host "====================================================================
 
 # Vérifier que la base de données locale existe
 if (-not (Test-Path $LocalDbPath)) {
-    Write-Host "❌ Erreur: La base de données locale '$LocalDbPath' est introuvable." -ForegroundColor Red
+    Write-Host "❌ Erreur: La base de donnees locale '$LocalDbPath' est introuvable." -ForegroundColor Red
     Write-Host "Veuillez vérifier le chemin et réessayer." -ForegroundColor Red
     exit 1
 }
@@ -87,7 +90,7 @@ try {
 
 # Étape 2: Créer une sauvegarde de la base de données actuelle
 Write-Host ""
-Write-Host "💾 Étape 2: Création d'une sauvegarde de la base de données production..." -ForegroundColor Yellow
+Write-Host "💾 Étape 2: Creation d'une sauvegarde de la base de donnees production..." -ForegroundColor Yellow
 $sshCommand = @"
 cd $AppDir
 mkdir -p backups
@@ -103,14 +106,14 @@ else
     DATE=\$(date +%Y%m%d_%H%M%S)
     docker run --rm -v gamr-platform_gamr-data:/data -v $AppDir/backups:/backup alpine sh -c "
         if [ -f /data/prod.db ]; then
-            cp /data/prod.db /backup/prod-backup-\$DATE.db && echo 'Sauvegarde créée: prod-backup-\$DATE.db'
+            cp /data/prod.db /backup/prod-backup-\$DATE.db && echo 'Sauvegarde creee: prod-backup-\$DATE.db'
         else
-            echo 'Aucune base de données existante à sauvegarder'
+            echo 'Aucune base de donnees existante a sauvegarder'
         fi
-    " 2>/dev/null || echo "Volume non trouvé ou erreur"
+    " 2>/dev/null || echo "Volume non trouve ou erreur"
 fi
 
-echo "✅ Sauvegarde terminée"
+echo "Sauvegarde terminee"
 "@
 
 ssh $SshUser@$VpsIp $sshCommand
@@ -122,7 +125,7 @@ Write-Host "🛑 Étape 3: Arrêt des conteneurs..." -ForegroundColor Yellow
 $sshCommand = @"
 cd $AppDir
 docker-compose -f docker-compose.prod.yml down
-echo "✅ Conteneurs arrêtés"
+echo "Conteneurs arretes"
 "@
 
 ssh $SshUser@$VpsIp $sshCommand
@@ -134,11 +137,11 @@ Write-Host "📦 Étape 4: Déploiement du code..." -ForegroundColor Yellow
 
 # Créer une archive du projet
 $tempFile = [System.IO.Path]::GetTempFileName() + ".tar.gz"
-Write-Host "Création de l'archive du projet..."
+Write-Host "Creation de l'archive du projet..."
 git archive --format=tar.gz -o $tempFile HEAD
 
 if (-not (Test-Path $tempFile)) {
-    Write-Host "❌ Erreur: Impossible de créer l'archive." -ForegroundColor Red
+    Write-Host "❌ Erreur: Impossible de creer l'archive." -ForegroundColor Red
     exit 1
 }
 
@@ -164,7 +167,7 @@ if [ -d nginx/ssl.backup ]; then rm -rf nginx/ssl && mv nginx/ssl.backup nginx/s
 # Nettoyer
 rm -f gamr-deploy.tar.gz
 
-echo "✅ Code déployé"
+echo "Code deploye"
 "@
 
 ssh $SshUser@$VpsIp $sshCommand
@@ -182,33 +185,15 @@ scp $LocalDbPath "$($SshUser)@$($VpsIp):/tmp/dev.db"
 
 # Remplacer dans le volume Docker
 Write-Host "Remplacement de la base de données dans le volume Docker..."
-$sshCommand = @"
+$sshCommand = @'
 # Copier la nouvelle base de données dans le volume
-docker run --rm -v gamr-platform_gamr-data:/data -v /tmp:/tmp alpine sh -c "
-    # Supprimer l'ancienne base de données si elle existe
-    rm -f /data/prod.db
-    
-    # Copier la nouvelle base de données
-    cp /tmp/dev.db /data/prod.db
-    
-    # Ajuster les permissions
-    chmod 644 /data/prod.db
-    
-    # Vérifier
-    if [ -f /data/prod.db ]; then
-        ls -lh /data/prod.db
-        echo '✅ Base de données remplacée avec succès'
-    else
-        echo '❌ Erreur: La base de données n a pas été copiée'
-        exit 1
-    fi
-"
+docker run --rm -v gamr-platform_gamr-data:/data -v /tmp:/tmp alpine sh -c "rm -f /data/prod.db && cp /tmp/dev.db /data/prod.db && chmod 644 /data/prod.db && ls -lh /data/prod.db && echo 'Base de donnees remplacee avec succes'"
 
 # Nettoyer le fichier temporaire
 rm -f /tmp/dev.db
 
-echo "✅ Base de données remplacée"
-"@
+echo "Base de donnees remplacee"
+'@
 
 ssh $SshUser@$VpsIp $sshCommand
 Write-Host "✅ Base de données remplacée" -ForegroundColor Green
@@ -220,7 +205,7 @@ $sshCommand = @"
 cd $AppDir
 docker-compose -f docker-compose.prod.yml build
 docker-compose -f docker-compose.prod.yml up -d
-echo "✅ Conteneurs redémarrés"
+echo "Conteneurs redemarres"
 "@
 
 ssh $SshUser@$VpsIp $sshCommand
@@ -231,25 +216,18 @@ Write-Host ""
 Write-Host "🔍 Étape 7: Vérification..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
-$sshCommand = @"
-echo "=== État des conteneurs ==="
+$sshCommand = @'
+echo "=== Etat des conteneurs ==="
 docker ps | grep -E 'CONTAINER|gamr'
 
 echo ""
-echo "=== Vérification de la base de données ==="
-docker run --rm -v gamr-platform_gamr-data:/data alpine sh -c "
-    if [ -f /data/prod.db ]; then
-        ls -lh /data/prod.db
-        echo '✅ Base de données présente'
-    else
-        echo '❌ Base de données absente'
-    fi
-"
+echo "=== Verification de la base de donnees ==="
+docker run --rm -v gamr-platform_gamr-data:/data alpine sh -c "if [ -f /data/prod.db ]; then ls -lh /data/prod.db && echo 'Base de donnees presente'; else echo 'Base de donnees absente'; fi"
 
 echo ""
-echo "=== Dernières lignes des logs ==="
+echo "=== Dernieres lignes des logs ==="
 docker logs --tail 20 gamr-platform 2>&1 | tail -10
-"@
+'@
 
 ssh $SshUser@$VpsIp $sshCommand
 
@@ -258,13 +236,16 @@ Write-Host "====================================================================
 Write-Host "🎉 Déploiement terminé!" -ForegroundColor Green
 Write-Host "========================================================================"
 Write-Host "📝 Informations:" -ForegroundColor Cyan
-Write-Host "- URL de l'application: https://$Domain"
-Write-Host "- Base de données remplacée depuis: $LocalDbPath"
-Write-Host "- Sauvegarde précédente dans: $AppDir/backups"
+Write-Host "- URL de l application: https://$($Domain)"
+Write-Host "- Base de donnees remplacee depuis: $LocalDbPath"
+Write-Host "- Sauvegarde precedente dans: $AppDir/backups"
 Write-Host ""
 Write-Host "📊 Commandes utiles:" -ForegroundColor Cyan
-Write-Host "- Voir les logs: ssh $SshUser@$VpsIp 'docker logs -f gamr-platform'"
-Write-Host "- Vérifier l'état: ssh $SshUser@$VpsIp 'docker ps'"
-Write-Host "- Tester l'API: curl https://$Domain/health"
+$logCmd = 'ssh ' + $SshUser + '@' + $VpsIp + " 'docker logs -f gamr-platform'"
+$statusCmd = 'ssh ' + $SshUser + '@' + $VpsIp + " 'docker ps'"
+$healthCmd = "curl https://$($Domain)/health"
+Write-Host "- Voir les logs: $logCmd"
+Write-Host "- Verifier l etat: $statusCmd"
+Write-Host "- Tester l API: $healthCmd"
 Write-Host "========================================================================"
 
