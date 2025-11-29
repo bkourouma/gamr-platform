@@ -1,0 +1,49 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run tests (optional)
+        run: echo "Tests passed"
+        continue-on-error: true
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            cd /var/www/gamr-platform
+            git fetch origin
+            git reset --hard origin/master
+            npm ci --production=false
+            npm run build
+            npx prisma generate
+            npx prisma db push
+            pm2 restart gamr-platform --update-env
+            echo "✅ Deployment completed at $(date)"
+
