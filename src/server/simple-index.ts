@@ -75,7 +75,8 @@ app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
 // Serve static files from the React app build directory
-const distPath = path.join(__dirname, '../../dist')
+// Use absolute path from /app to avoid issues with __dirname in tsx
+const distPath = process.env.DIST_PATH || path.join(process.cwd(), 'dist')
 app.use(express.static(distPath))
 
 // API info endpoint (moved to /api/info)
@@ -137,6 +138,13 @@ app.use('/api/rag', ragRoutes)
 
 // Catch-all handler: send back React's index.html file for client-side routing
 app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({
+      error: 'Not Found',
+      message: `API route ${req.originalUrl} not found`
+    })
+  }
   res.sendFile(path.join(distPath, 'index.html'))
 })
 

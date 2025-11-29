@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/input'
+import { Input } from '../components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Shield, Eye, EyeOff, AlertCircle, Loader2, Sparkles, Lock, Mail, Zap, Users, TrendingUp, BarChart3 } from 'lucide-react'
 
