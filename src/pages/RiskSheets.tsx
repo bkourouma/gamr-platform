@@ -307,7 +307,7 @@ export const RiskSheets: React.FC = () => {
                       </div>
                       <div>
                         <span className="text-xs font-medium text-gray-500">Score de risque</span>
-                        <div className="text-sm font-semibold text-gray-900">{risk.riskScore}/100</div>
+                        <div className="text-sm font-semibold text-gray-900">{risk.riskScore}/60</div>
                       </div>
                     </div>
                     

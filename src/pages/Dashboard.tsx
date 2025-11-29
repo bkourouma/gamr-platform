@@ -18,40 +18,70 @@ import {
   ArrowDownRight,
   Minus
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { riskSheetsApi } from '../lib/api'
+import { useEffect, useState, useMemo } from 'react'
+import { riskSheetsApi, actionsApi } from '../lib/api'
 
 export const Dashboard: React.FC = () => {
-  const [averageRiskScore, setAverageRiskScore] = useState<number>(0)
+  const [securityIndex, setSecurityIndex] = useState<number>(0)
+  const [securityIndexDetails, setSecurityIndexDetails] = useState<{
+    evaluationScore: number
+    correctiveActionCoverage: number
+    criticalRisksResolutionRate: number
+    securityObjectivesCompliance: number
+  } | null>(null)
+  const [totalRisks, setTotalRisks] = useState<number>(0)
+  const [criticalRisks, setCriticalRisks] = useState<number>(0)
+  const [inProgressActions, setInProgressActions] = useState<number>(0)
 
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const s = await riskSheetsApi.getStats()
-        setAverageRiskScore(s.averageRiskScore || 0)
+        const [riskStats, actionStats] = await Promise.all([
+          riskSheetsApi.getStats(),
+          actionsApi.getStats()
+        ])
+        
+        // Utiliser le nouveau calcul de l'Indice Global de Sécurité GAMR (échelle 1-60)
+        // Sinon, utiliser l'ancien averageRiskScore (déjà sur échelle GAMR 1-60)
+        const index = riskStats.averageSecurityIndex !== undefined 
+          ? riskStats.averageSecurityIndex 
+          : (riskStats.averageRiskScore || 1) // Déjà sur échelle GAMR 1-60
+        setSecurityIndex(Math.round(index))
+        
+        if (riskStats.securityIndexDetails) {
+          setSecurityIndexDetails(riskStats.securityIndexDetails)
+        }
+        
+        // Mettre à jour les statistiques réelles
+        setTotalRisks(riskStats.totalRisks)
+        setCriticalRisks(riskStats.criticalRisks)
+        setInProgressActions(actionStats.inProgressActions)
       } catch (e) {
         // ignore dashboard average errors for now
+        console.error('Erreur lors du chargement des statistiques:', e)
       }
     }
     loadStats()
   }, [])
 
-  const stats = [
+  const stats = useMemo(() => [
     {
       name: 'Indice Global de Sécurité',
-      value: `${averageRiskScore}`,
+      value: `${securityIndex}`,
       change: '0',
-      changeType: 'neutral',
+      changeType: 'neutral' as const,
       icon: Shield,
       gradient: 'from-success-500 to-success-600',
       bgGradient: 'from-success-50 to-success-100',
-      description: 'Moyenne des notes de risque (1–60)'
+      description: securityIndexDetails 
+        ? `Éval: ${securityIndexDetails.evaluationScore.toFixed(1)} | Actions: ${securityIndexDetails.correctiveActionCoverage.toFixed(1)} | Résolution: ${securityIndexDetails.criticalRisksResolutionRate.toFixed(1)} (échelle GAMR 1-60)`
+        : 'Indice GAMR basé sur évaluations (40%), actions correctives (30%), résolution risques critiques (20%) et conformité (10%). Échelle: 1-60 (1-15=Faible, 45-60=Élevé)'
     },
     {
       name: 'Risques actifs',
-      value: '24',
-      change: '+2',
-      changeType: 'increase',
+      value: `${totalRisks}`,
+      change: '0',
+      changeType: 'neutral' as const,
       icon: Shield,
       gradient: 'from-primary-500 to-primary-600',
       bgGradient: 'from-primary-50 to-primary-100',
@@ -59,9 +89,9 @@ export const Dashboard: React.FC = () => {
     },
     {
       name: 'Risques critiques',
-      value: '3',
-      change: '-1',
-      changeType: 'decrease',
+      value: `${criticalRisks}`,
+      change: '0',
+      changeType: 'neutral' as const,
       icon: AlertTriangle,
       gradient: 'from-danger-500 to-danger-600',
       bgGradient: 'from-danger-50 to-danger-100',
@@ -69,15 +99,15 @@ export const Dashboard: React.FC = () => {
     },
     {
       name: 'Actions en cours',
-      value: '12',
-      change: '+4',
-      changeType: 'increase',
+      value: `${inProgressActions}`,
+      change: '0',
+      changeType: 'neutral' as const,
       icon: Activity,
       gradient: 'from-warning-500 to-warning-600',
       bgGradient: 'from-warning-50 to-warning-100',
       description: 'Mesures correctives actives'
     }
-  ]
+  ], [securityIndex, securityIndexDetails, totalRisks, criticalRisks, inProgressActions])
 
   const recentRisks = [
     {
@@ -304,7 +334,7 @@ export const Dashboard: React.FC = () => {
                               </span>
                               <div className="flex items-center space-x-1 text-xs text-gray-500">
                                 <span>Score:</span>
-                                <span className="font-semibold text-gray-700">{risk.score}/100</span>
+                                <span className="font-semibold text-gray-700">{risk.score}/60</span>
                               </div>
                               <div className="flex items-center space-x-1 text-xs text-gray-500">
                                 <span>•</span>

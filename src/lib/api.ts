@@ -346,6 +346,13 @@ export const riskSheetsApi = {
     recentRisks: number
     risksByCategory: Array<{ category: string; count: number }>
     averageRiskScore: number
+    averageSecurityIndex?: number  // Indice Global de Sécurité (nouveau calcul)
+    securityIndexDetails?: {
+      evaluationScore: number
+      correctiveActionCoverage: number
+      criticalRisksResolutionRate: number
+      securityObjectivesCompliance: number
+    }
   }> {
     return apiClient.get('/risk-sheets/stats/dashboard')
   },

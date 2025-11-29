@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { prisma } from '../lib/prisma'
-import { authMiddleware, requireRole } from '../middleware/auth'
+import { authMiddleware, requireRole, requireEvaluatorRole } from '../middleware/auth'
 import { validatePagination } from '../middleware/validation'
 
 const router = Router()
@@ -125,7 +125,7 @@ router.get('/stats', async (req, res) => {
         where: { tenantId, status: 'TODO' }
       }),
       prisma.action.count({
-        where: { tenantId, status: 'IN_PROGRESS' }
+        where: { tenantId, status: { in: ['TODO', 'IN_PROGRESS'] } }
       }),
       prisma.action.count({
         where: { tenantId, status: 'COMPLETED' }
@@ -212,7 +212,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // POST /api/actions - Créer une nouvelle action
-router.post('/', requireRole(['ADMIN', 'AI_ANALYST', 'EVALUATOR']), async (req, res) => {
+router.post('/', requireEvaluatorRole, async (req, res) => {
   try {
     const { tenantId } = req.user!
     const { 
@@ -326,7 +326,7 @@ router.put('/:id', async (req, res) => {
       // L'assigné peut toujours mettre à jour
       existingAction.assigneeId === userId ||
       // Les admins et analystes peuvent mettre à jour
-      ['ADMIN', 'AI_ANALYST', 'EVALUATOR'].includes(role)
+      ['SUPER_ADMIN', 'ADMIN', 'AI_ANALYST', 'EVALUATOR'].includes(role)
 
     if (!canUpdate) {
       return res.status(403).json({
@@ -396,7 +396,7 @@ router.put('/:id', async (req, res) => {
 
 // DELETE /api/actions/:id - Supprimer une action
 // Autoriser aussi les évaluateurs à supprimer des actions liées aux risques
-router.delete('/:id', requireRole(['ADMIN', 'AI_ANALYST', 'EVALUATOR']), async (req, res) => {
+router.delete('/:id', requireEvaluatorRole, async (req, res) => {
   try {
     const { id } = req.params
     const { tenantId } = req.user!

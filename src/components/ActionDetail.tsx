@@ -191,7 +191,7 @@ export const ActionDetail: React.FC<ActionDetailProps> = ({ action, isOpen, onCl
                         <div className="font-medium text-blue-900">{action.riskSheet.target}</div>
                         <div className="text-sm text-blue-700">{action.riskSheet.scenario}</div>
                         <div className="text-xs text-blue-600 mt-1">
-                          Score de risque: {Math.round(action.riskSheet.riskScore)}/100
+                          Score de risque: {Math.round(action.riskSheet.riskScore)}/60
                         </div>
                       </div>
                     </div>

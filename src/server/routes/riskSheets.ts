@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma'
 import { calculateRiskScore, getPriorityFromScore } from '../../lib/utils'
 import { authMiddleware } from '../middleware/auth'
 import { validateRiskSheet } from '../middleware/validation'
+import { SecurityIndexService } from '../services/securityIndexService'
 
 const router = express.Router()
 
@@ -264,7 +265,8 @@ router.get('/stats/dashboard', async (req, res) => {
       highRisks,
       recentRisks,
       risksByCategory,
-      averageAggregation
+      averageAggregation,
+      securityIndexComponents
     ] = await Promise.all([
       prisma.riskSheet.count({
         where: { tenantId, isArchived: false }
@@ -292,8 +294,22 @@ router.get('/stats/dashboard', async (req, res) => {
       prisma.riskSheet.aggregate({
         where: { tenantId, isArchived: false },
         _avg: { riskScore: true }
-      })
+      }),
+      SecurityIndexService.calculateSecurityIndex(tenantId)
     ])
+
+    // Calculer l'indice de sécurité selon la méthodologie GAMR (échelle 1-60)
+    // Si pas assez de données pour le calcul complexe, utiliser l'ancien calcul comme fallback
+    const averageRiskScoreValue = Math.round(((averageAggregation._avg.riskScore || 0)) * 10) / 10
+    // Le averageRiskScore est déjà sur l'échelle GAMR (1-60) selon la formule P × V × I
+    const oldGamrIndex = Math.max(1, Math.min(60, averageRiskScoreValue))
+    
+    // Utiliser le nouveau calcul seulement si on a des évaluations ou des risques critiques
+    // Sinon, utiliser l'ancien calcul (moyenne des riskScore, déjà sur échelle GAMR 1-60)
+    const hasEnoughData = securityIndexComponents.evaluationScore > 1 || criticalRisks > 0
+    const finalSecurityIndex = hasEnoughData 
+      ? securityIndexComponents.globalSecurityIndex
+      : oldGamrIndex
 
     res.json({
       totalRisks,
@@ -304,7 +320,15 @@ router.get('/stats/dashboard', async (req, res) => {
         category: item.category,
         count: item._count
       })),
-      averageRiskScore: Math.round(((averageAggregation._avg.riskScore || 0)) * 10) / 10
+      averageRiskScore: averageRiskScoreValue,
+      // Indice Global de Sécurité calculé selon l'algorithme complexe (ou ancien calcul si données insuffisantes)
+      averageSecurityIndex: Math.round(finalSecurityIndex * 100) / 100,
+      securityIndexDetails: {
+        evaluationScore: securityIndexComponents.evaluationScore,
+        correctiveActionCoverage: securityIndexComponents.correctiveActionCoverage,
+        criticalRisksResolutionRate: securityIndexComponents.criticalRisksResolutionRate,
+        securityObjectivesCompliance: securityIndexComponents.securityObjectivesCompliance
+      }
     })
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques:', error)
@@ -313,5 +337,3 @@ router.get('/stats/dashboard', async (req, res) => {
 })
 
 export { router as riskSheetsRouter }
-
-

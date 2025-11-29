@@ -197,7 +197,7 @@ export const ActionForm: React.FC<ActionFormProps> = ({ action, isOpen, onClose,
                   <option value="">Sélectionner une fiche de risque</option>
                   {riskSheets.map((risk) => (
                     <option key={risk.id} value={risk.id}>
-                      {risk.target} (Score: {Math.round(risk.riskScore)}/100)
+                      {risk.target} (Score: {Math.round(risk.riskScore)}/60)
                     </option>
                   ))}
                 </select>

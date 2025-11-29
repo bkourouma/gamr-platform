@@ -1114,8 +1114,8 @@ export const RiskSheetDetail: React.FC = () => {
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <div>
-                <div className="text-4xl font-bold text-gray-900">{riskScore}</div>
-                <div className="text-sm text-gray-600">Score de risque</div>
+                <div className="text-4xl font-bold text-gray-900">{riskScore}/60</div>
+                <div className="text-sm text-gray-600">Score de risque GAMR</div>
               </div>
               
               <Badge className={`${priorityConfig.color} border`}>

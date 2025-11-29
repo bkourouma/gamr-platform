@@ -574,7 +574,7 @@ export const EvaluationDetail: React.FC = () => {
                 {evaluation.totalScore !== undefined && (
                   <div>
                     <div className="text-sm font-medium text-gray-700 mb-1">Score total</div>
-                    <div className="text-2xl font-bold text-gray-900">{evaluation.totalScore}/100</div>
+                    <div className="text-2xl font-bold text-gray-900">{evaluation.totalScore}/60</div>
                   </div>
                 )}
                 
