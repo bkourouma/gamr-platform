@@ -26,8 +26,27 @@ const PORT = process.env.PORT || 3002
 // Trust proxy
 app.set('trust proxy', 1)
 
-// Security headers
-app.use(helmet())
+// Security headers with CSP configured for OpenAI API access
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: [
+        "'self'",
+        "https://api.openai.com",
+        "https://*.openai.com",
+        process.env.VITE_API_URL || "",
+        process.env.FRONTEND_URL || ""
+      ].filter(Boolean),
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"]
+    }
+  }
+}))
 
 // CORS
 const allowedOrigins = [
@@ -75,8 +94,7 @@ app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
 // Serve static files from the React app build directory
-// Use absolute path from /app to avoid issues with __dirname in tsx
-const distPath = process.env.DIST_PATH || path.join(process.cwd(), 'dist')
+const distPath = path.join(__dirname, '../../dist')
 app.use(express.static(distPath))
 
 // API info endpoint (moved to /api/info)
@@ -138,13 +156,6 @@ app.use('/api/rag', ragRoutes)
 
 // Catch-all handler: send back React's index.html file for client-side routing
 app.get('*', (req, res) => {
-  // Skip API routes
-  if (req.path.startsWith('/api')) {
-    return res.status(404).json({
-      error: 'Not Found',
-      message: `API route ${req.originalUrl} not found`
-    })
-  }
   res.sendFile(path.join(distPath, 'index.html'))
 })
 
