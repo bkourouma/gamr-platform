@@ -24,8 +24,27 @@ const PORT = process.env.PORT || 3002
 // Trust proxy (for correct rate limiting and IPs behind proxies)
 app.set('trust proxy', 1)
 
-// Basic security headers
-app.use(helmet())
+// Security headers with CSP configured for OpenAI API access
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: [
+        "'self'",
+        "https://api.openai.com",
+        "https://*.openai.com",
+        process.env.VITE_API_URL || "",
+        process.env.FRONTEND_URL || ""
+      ].filter(Boolean),
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"]
+    }
+  }
+}))
 
 // CORS configuration
 // Supports comma-separated lists in FRONTEND_URL, CORS_ORIGIN, or CORS_ORIGINS
@@ -232,7 +251,7 @@ function generateContextualResponse(query: string) {
       'Salutations ! Je suis Akissi, spécialisée dans l\'analyse des risques BMI. Comment puis-je vous être utile ?'
     ],
     risk: [
-      'Pour analyser vos risques critiques, je vous recommande de consulter vos fiches GAMR les plus récentes. Souhaitez-vous que je vous aide à identifier les priorités d\'action ?',
+      'Pour analyser vos risques critiques, je vous recommande de consulter vos fiches GAMRDIGITALE les plus récentes. Souhaitez-vous que je vous aide à identifier les priorités d\'action ?',
       'Vos risques les plus critiques nécessitent une attention particulière. Je peux vous aider à établir un plan d\'action prioritaire.',
       'L\'analyse de vos risques montre plusieurs points d\'attention. Voulez-vous que je vous aide à établir les prochaines étapes ?'
     ],
@@ -352,7 +371,7 @@ app.use('*', (req, res) => {
 // Démarrage du serveur amélioré
 const startServer = async () => {
   try {
-    console.log('🚀 Démarrage du serveur GAMR...')
+    console.log('🚀 Démarrage du serveur GAMRDIGITALE...')
     if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
       console.error('❌ JWT_SECRET manquant en production. Abandon du démarrage.')
       process.exit(1)
