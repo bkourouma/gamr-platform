@@ -20,7 +20,7 @@ async function seedSecurityTemplate() {
     // Vérifier si le template existe déjà
     const existingTemplate = await prisma.evaluationTemplate.findFirst({
       where: {
-        name: 'Évaluation Sécuritaire GAMR',
+        name: 'Évaluation Sécuritaire GAMRDIGITALE',
         tenantId: tenant.id
       }
     })
@@ -33,7 +33,7 @@ async function seedSecurityTemplate() {
     // Créer le template d'évaluation sécuritaire
     const template = await prisma.evaluationTemplate.create({
       data: {
-        name: 'Évaluation Sécuritaire GAMR',
+        name: 'Évaluation Sécuritaire GAMRDIGITALE',
         description: 'Questionnaire complet d\'évaluation sécuritaire avec 42 objectifs couvrant tous les aspects de la sécurité physique et organisationnelle',
         version: '1.0',
         tenantId: tenant.id,
@@ -122,7 +122,7 @@ async function seedSecurityTemplate() {
     for (const otherTenant of otherTenants) {
       const existingForTenant = await prisma.evaluationTemplate.findFirst({
         where: {
-          name: 'Évaluation Sécuritaire GAMR',
+          name: 'Évaluation Sécuritaire GAMRDIGITALE',
           tenantId: otherTenant.id
         }
       })
@@ -130,7 +130,7 @@ async function seedSecurityTemplate() {
       if (!existingForTenant) {
         await prisma.evaluationTemplate.create({
           data: {
-            name: 'Évaluation Sécuritaire GAMR',
+            name: 'Évaluation Sécuritaire GAMRDIGITALE',
             description: 'Questionnaire complet d\'évaluation sécuritaire avec 42 objectifs couvrant tous les aspects de la sécurité physique et organisationnelle',
             version: '1.0',
             tenantId: otherTenant.id,

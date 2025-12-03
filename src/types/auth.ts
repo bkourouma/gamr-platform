@@ -1,4 +1,4 @@
-// Authentication types for the GAMR platform
+// Authentication types for the GAMRDIGITALE platform
 
 export interface User {
   id: string

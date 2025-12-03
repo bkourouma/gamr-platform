@@ -1,4 +1,4 @@
-# Script PowerShell pour déployer GAMR Platform sur un VPS Hostinger totalement neuf
+# Script PowerShell pour déployer GAMRDIGITALE Platform sur un VPS Hostinger totalement neuf
 # Usage: .\deploy-to-hostinger.ps1 -VpsIp <ip-vps> -Domain <domaine>
 
 param (
@@ -21,7 +21,7 @@ param (
 $AppDir = "/opt/gamr"
 $CurrentDir = Get-Location
 
-Write-Host "🚀 Déploiement de GAMR Platform sur VPS Hostinger" -ForegroundColor Cyan
+Write-Host "🚀 Déploiement de GAMRDIGITALE Platform sur VPS Hostinger" -ForegroundColor Cyan
 Write-Host "------------------------------------------------"
 Write-Host "IP du VPS: $VpsIp"
 Write-Host "Domaine: $Domain"

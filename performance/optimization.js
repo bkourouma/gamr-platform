@@ -1,4 +1,4 @@
-// Performance optimization configuration for GAMR Platform
+// Performance optimization configuration for GAMRDIGITALE Platform
 // Implements caching, compression, and performance monitoring
 
 const compression = require('compression');

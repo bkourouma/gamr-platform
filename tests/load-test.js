@@ -1,4 +1,4 @@
-// Load testing script for GAMR Platform
+// Load testing script for GAMRDIGITALE Platform
 // Tests application performance under various load conditions
 
 const axios = require('axios');
@@ -168,7 +168,7 @@ class LoadTester {
         const stats = this.calculateStats();
         
         console.clear();
-        console.log('🔥 GAMR Platform Load Test - Real-time Statistics');
+        console.log('🔥 GAMRDIGITALE Platform Load Test - Real-time Statistics');
         console.log('='.repeat(60));
         console.log(`📊 Requests: ${stats.requests} | Responses: ${stats.responses} | Errors: ${stats.errors}`);
         console.log(`📈 Error Rate: ${stats.errorRate}% | Timeouts: ${stats.timeouts}`);
@@ -258,7 +258,7 @@ class LoadTester {
         const rps = (stats.responses / ((this.duration + this.rampUp) / 1000)).toFixed(2);
         
         console.clear();
-        console.log('🏁 GAMR Platform Load Test - Final Results');
+        console.log('🏁 GAMRDIGITALE Platform Load Test - Final Results');
         console.log('='.repeat(60));
         console.log(`🎯 Target: ${this.baseUrl}`);
         console.log(`⚙️  Config: ${this.concurrency} users, ${this.duration/1000}s duration`);

@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# GAMR Platform - Script de déploiement Hostinger (SANS Docker)
+# GAMRDIGITALE Platform - Script de déploiement Hostinger (SANS Docker)
 # Exécuter sur le VPS pour mettre à jour l'application
 # N'affecte PAS les autres applications
 # =============================================================================
@@ -10,7 +10,7 @@ set -e
 APP_NAME="gamr-platform"
 APP_DIR="/var/www/$APP_NAME"
 
-echo "🚀 Déploiement GAMR Platform sur Hostinger..."
+echo "🚀 Déploiement GAMRDIGITALE Platform sur Hostinger..."
 echo "   Répertoire: $APP_DIR"
 echo ""
 

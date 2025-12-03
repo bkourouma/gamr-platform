@@ -145,7 +145,7 @@ Voici les risques les plus critiques actuellement identifiés dans votre organis
   
   // Default response for general queries
   return {
-    answer: `🤖 **Assistant GAMR** - Analyse de votre question: "${query}"
+    answer: `🤖 **Assistant GAMRDIGITALE** - Analyse de votre question: "${query}"
 
 **Informations disponibles dans votre système:**
 

@@ -298,14 +298,14 @@ router.get('/stats/dashboard', async (req, res) => {
       SecurityIndexService.calculateSecurityIndex(tenantId)
     ])
 
-    // Calculer l'indice de sécurité selon la méthodologie GAMR (échelle 1-60)
+    // Calculer l'indice de sécurité selon la méthodologie GAMRDIGITALE (échelle 1-60)
     // Si pas assez de données pour le calcul complexe, utiliser l'ancien calcul comme fallback
     const averageRiskScoreValue = Math.round(((averageAggregation._avg.riskScore || 0)) * 10) / 10
-    // Le averageRiskScore est déjà sur l'échelle GAMR (1-60) selon la formule P × V × I
+    // Le averageRiskScore est déjà sur l'échelle GAMRDIGITALE (1-60) selon la formule P × V × I
     const oldGamrIndex = Math.max(1, Math.min(60, averageRiskScoreValue))
     
     // Utiliser le nouveau calcul seulement si on a des évaluations ou des risques critiques
-    // Sinon, utiliser l'ancien calcul (moyenne des riskScore, déjà sur échelle GAMR 1-60)
+    // Sinon, utiliser l'ancien calcul (moyenne des riskScore, déjà sur échelle GAMRDIGITALE 1-60)
     const hasEnoughData = securityIndexComponents.evaluationScore > 1 || criticalRisks > 0
     const finalSecurityIndex = hasEnoughData 
       ? securityIndexComponents.globalSecurityIndex

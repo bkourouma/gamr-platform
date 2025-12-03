@@ -127,14 +127,14 @@ export const RiskSheets: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">GAMR</h1>
-            <p className="text-gray-600">Gestion et suivi de vos analyses GAMR</p>
+            <h1 className="text-2xl font-bold text-gray-900">GAMRDIGITALE</h1>
+            <p className="text-gray-600">Gestion et suivi de vos analyses GAMRDIGITALE</p>
           </div>
         </div>
         <Card>
           <CardContent className="p-12 text-center">
             <Loader2 className="w-8 h-8 text-primary-600 mx-auto mb-4 animate-spin" />
-            <p className="text-gray-600">Chargement des GAMR...</p>
+            <p className="text-gray-600">Chargement des GAMRDIGITALE...</p>
           </CardContent>
         </Card>
       </div>
@@ -147,8 +147,8 @@ export const RiskSheets: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">GAMR</h1>
-            <p className="text-gray-600">Gestion et suivi de vos analyses GAMR</p>
+            <h1 className="text-2xl font-bold text-gray-900">GAMRDIGITALE</h1>
+            <p className="text-gray-600">Gestion et suivi de vos analyses GAMRDIGITALE</p>
           </div>
         </div>
         <Card>
@@ -170,8 +170,8 @@ export const RiskSheets: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">GAMR</h1>
-          <p className="text-gray-600">Gestion et suivi de vos analyses GAMR</p>
+          <h1 className="text-2xl font-bold text-gray-900">GAMRDIGITALE</h1>
+          <p className="text-gray-600">Gestion et suivi de vos analyses GAMRDIGITALE</p>
         </div>
         <div className="flex space-x-3">
           <Button

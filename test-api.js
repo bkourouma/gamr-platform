@@ -3,7 +3,7 @@
 const API_BASE = 'http://localhost:3002/api';
 
 async function testAPI() {
-  console.log('🧪 Test des API GAMR...\n');
+  console.log('🧪 Test des API GAMRDIGITALE...\n');
 
   // Test 1: Health check
   try {

@@ -223,5 +223,5 @@ Points négatifs:
 
 ---
 
-**Version 2.1 - Système d'Analyse IA GAMR**
+**Version 2.1 - Système d'Analyse IA GAMRDIGITALE**
 *Précis, factuel, traçable*

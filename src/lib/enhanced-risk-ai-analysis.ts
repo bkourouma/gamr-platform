@@ -863,7 +863,7 @@ function generateEnhancedOverallAssessment(
   const riskScore = reasoningResult.probability.score * reasoningResult.vulnerability.score * reasoningResult.impact.score
   const normalizedScore = Math.round((riskScore / 60) * 100)
 
-  let assessment = `Analyse IA Avancée - GAMR Platform\n\n`
+  let assessment = `Analyse IA Avancée - GAMRDIGITALE Platform\n\n`
 
   assessment += `Cible analysée: ${riskData.target}\n`
   assessment += `Scénario: ${riskData.scenario}\n\n`

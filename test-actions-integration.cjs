@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Test script for Actions Integration in GAMR Platform
+ * Test script for Actions Integration in GAMRDIGITALE Platform
  * Tests the "Priorités d'actions" section functionality
  */
 

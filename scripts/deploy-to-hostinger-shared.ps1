@@ -1,4 +1,4 @@
-# Script PowerShell pour déployer GAMR Platform sur un VPS Hostinger partagé
+# Script PowerShell pour déployer GAMRDIGITALE Platform sur un VPS Hostinger partagé
 # Usage: .\deploy-to-hostinger-shared.ps1 -VpsIp <ip-vps> -Domain <domaine>
 
 param (
@@ -17,7 +17,7 @@ param (
 
 $CurrentDir = Get-Location
 
-Write-Host "🚀 Déploiement de GAMR Platform sur VPS Hostinger partagé" -ForegroundColor Cyan
+Write-Host "🚀 Déploiement de GAMRDIGITALE Platform sur VPS Hostinger partagé" -ForegroundColor Cyan
 Write-Host "------------------------------------------------"
 Write-Host "IP du VPS: $VpsIp"
 Write-Host "Domaine: $Domain"
@@ -160,7 +160,7 @@ Write-Host "🔧 Étape 3: Modification de la configuration Nginx..." -Foregroun
 $sshCommand = @"
 # Créer un fichier de configuration Nginx spécifique pour ce domaine
 cat > $AppDir/nginx-$Domain.conf << 'EOT'
-# Configuration Nginx pour GAMR Platform - $Domain
+# Configuration Nginx pour GAMRDIGITALE Platform - $Domain
 server {
     listen 80;
     server_name $Domain www.$Domain;

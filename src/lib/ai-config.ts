@@ -1,4 +1,4 @@
-// AI Configuration Management for GAMR Platform
+// AI Configuration Management for GAMRDIGITALE Platform
 
 interface AIConfig {
   openai: {

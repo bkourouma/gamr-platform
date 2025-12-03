@@ -1,4 +1,4 @@
-// Test du moteur de raisonnement avancé pour l'analyse des risques GAMR
+// Test du moteur de raisonnement avancé pour l'analyse des risques GAMRDIGITALE
 const { generateEnhancedAIAnalysis } = require('./src/lib/enhanced-risk-ai-analysis.ts')
 
 // Données de test avec évaluations complètes et variées
@@ -22,7 +22,7 @@ const mockEvaluationsAdvanced = [
       location: "Johannesburg"
     },
     template: {
-      name: "GAMR - Évaluation Sécurité Complète",
+      name: "GAMRDIGITALE - Évaluation Sécurité Complète",
       description: "Questionnaire complet 42 objectifs"
     },
     responses: [
@@ -121,7 +121,7 @@ const mockEvaluationsAdvanced = [
       location: "Pretoria"
     },
     template: {
-      name: "GAMR - Évaluation Sécurité Complète",
+      name: "GAMRDIGITALE - Évaluation Sécurité Complète",
       description: "Questionnaire complet 42 objectifs"
     },
     responses: [
@@ -180,7 +180,7 @@ const mockEvaluationsAdvanced = [
       location: "Cape Town"
     },
     template: {
-      name: "GAMR - Évaluation Sécurité Complète",
+      name: "GAMRDIGITALE - Évaluation Sécurité Complète",
       description: "Questionnaire complet 42 objectifs"
     },
     responses: [
@@ -229,7 +229,7 @@ const mockEvaluationsAdvanced = [
 ]
 
 async function testAdvancedReasoning() {
-  console.log('🧠 Test du moteur de raisonnement avancé GAMR')
+  console.log('🧠 Test du moteur de raisonnement avancé GAMRDIGITALE')
   console.log('=' .repeat(80))
   
   try {

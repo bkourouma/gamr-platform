@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# GAMR Platform Deployment Script
-# This script handles the deployment of GAMR Platform to various environments
+# GAMRDIGITALE Platform Deployment Script
+# This script handles the deployment of GAMRDIGITALE Platform to various environments
 
 set -e  # Exit on any error
 

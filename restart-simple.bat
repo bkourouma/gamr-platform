@@ -1,11 +1,11 @@
 @echo off
 echo ========================================
-echo GAMR Platform - Simple Restart
+echo GAMRDIGITALE Platform - Simple Restart
 echo ========================================
 echo.
 
 REM Don't close window on error
-if not defined GAMR_NO_PAUSE set GAMR_NO_PAUSE=0
+if not defined GAMRDIGITALE_NO_PAUSE set GAMRDIGITALE_NO_PAUSE=0
 
 echo Step 1: Checking npm...
 where npm
@@ -77,7 +77,7 @@ echo.
 
 echo Step 6: Starting backend server...
 cd /d "%~dp0"
-start "GAMR Backend" cmd /k "set PORT=%BACK_PORT% && npm run server:dev"
+start "GAMRDIGITALE Backend" cmd /k "set PORT=%BACK_PORT% && npm run server:dev"
 echo Backend started in new window
 echo.
 
@@ -88,7 +88,7 @@ echo.
 echo Step 8: Starting frontend server...
 echo   Frontend port: %FRONT_PORT%
 echo   Proxy target: http://localhost:%BACK_PORT%
-start "GAMR Frontend [Port %FRONT_PORT%]" cmd /k "set PORT=%FRONT_PORT% && set VITE_PORT=%FRONT_PORT% && set BACKEND_PORT=%BACK_PORT% && set VITE_BACKEND_PORT=%BACK_PORT% && set VITE_PROXY_TARGET=http://localhost:%BACK_PORT% && echo Starting Vite on port %FRONT_PORT% with backend at %BACK_PORT%... && npm run dev"
+start "GAMRDIGITALE Frontend [Port %FRONT_PORT%]" cmd /k "set PORT=%FRONT_PORT% && set VITE_PORT=%FRONT_PORT% && set BACKEND_PORT=%BACK_PORT% && set VITE_BACKEND_PORT=%BACK_PORT% && set VITE_PROXY_TARGET=http://localhost:%BACK_PORT% && echo Starting Vite on port %FRONT_PORT% with backend at %BACK_PORT%... && npm run dev"
 echo Frontend started in new window
 echo.
 
@@ -102,7 +102,7 @@ if %ERRORLEVEL% equ 0 (
     echo OK - Backend is listening on port %BACK_PORT%
 ) else (
     echo WARNING - Backend NOT detected on port %BACK_PORT%
-    echo Check the "GAMR Backend" window for errors!
+    echo Check the "GAMRDIGITALE Backend" window for errors!
 )
 echo.
 
@@ -112,7 +112,7 @@ if %ERRORLEVEL% equ 0 (
     echo OK - Frontend is listening on port %FRONT_PORT%
 ) else (
     echo WARNING - Frontend NOT detected on port %FRONT_PORT%
-    echo Check the "GAMR Frontend" window for errors!
+    echo Check the "GAMRDIGITALE Frontend" window for errors!
 )
 echo.
 

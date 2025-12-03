@@ -1,4 +1,4 @@
-# 🛡️ GAMR - Plateforme Intelligente de Gestion des Risques
+# 🛡️ GAMRDIGITALE - Plateforme Intelligente de Gestion des Risques
 
 Une plateforme moderne et intelligente pour la gestion des risques avec analyse prédictive IA, architecture multi-tenant et interface utilisateur intuitive.
 
@@ -23,7 +23,7 @@ Une plateforme moderne et intelligente pour la gestion des risques avec analyse 
 - **Interface utilisateur moderne** avec React + Tailwind CSS
 - **Base de données SQLite** avec Prisma ORM
 - **Système d'authentification JWT** avec rôles granulaires
-- **Gestion des fiches GAMR** avec calcul automatique des scores
+- **Gestion des fiches GAMRDIGITALE** avec calcul automatique des scores
 - **Dashboard interactif** avec métriques et visualisations
 - **Système de rôles** (Super Admin, Admin, Analyste IA, Évaluateur, Lecteur)
 
@@ -31,7 +31,7 @@ Une plateforme moderne et intelligente pour la gestion des risques avec analyse 
 - **Questionnaires de sécurité** avec 42 objectifs structurés
 - **Système de réponses** avec validation et scoring automatique
 - **Templates d'évaluation** personnalisables par tenant
-- **Génération automatique** de fiches GAMR depuis les évaluations
+- **Génération automatique** de fiches GAMRDIGITALE depuis les évaluations
 - **Interface de questionnaire** intuitive avec navigation fluide
 - **10 modèles d'évaluation** prédéfinis (sécurité globale, propriété, personnel, etc.)
 
@@ -155,7 +155,7 @@ gamr-platform/
 │   ├── pages/                  # Pages de l'application
 │   │   ├── Dashboard.tsx       # Tableau de bord
 │   │   ├── Login.tsx           # Authentification
-│   │   ├── RiskSheets.tsx      # Gestion des fiches GAMR
+│   │   ├── RiskSheets.tsx      # Gestion des fiches GAMRDIGITALE
 │   │   ├── Evaluations.tsx     # Évaluations de sécurité
 │   │   ├── ActionsPage.tsx     # Actions correctives
 │   │   ├── ChatPage.tsx        # Chat IA
@@ -205,7 +205,7 @@ gamr-platform/
 - `PUT /:id` - Modifier une évaluation
 - `DELETE /:id` - Supprimer une évaluation
 - `POST /:id/responses` - Sauvegarder réponses
-- `POST /:id/generate-gamr` - Générer fiche GAMR
+- `POST /:id/generate-gamrdigitale` - Générer fiche GAMR
 
 ### Templates (`/api/templates`)
 - `GET /` - Liste des templates
@@ -290,7 +290,7 @@ gamr-platform/
 }
 ```
 
-#### RiskSheet (Fiche GAMR)
+#### RiskSheet (Fiche GAMRDIGITALE)
 ```typescript
 {
   id: string
@@ -353,7 +353,7 @@ gamr-platform/
 }
 ```
 
-### Calcul des Scores GAMR
+### Calcul des Scores GAMRDIGITALE
 ```typescript
 // Score de risque normalisé sur 100
 riskScore = (probability × vulnerability × impact) / 60 × 100
@@ -494,7 +494,7 @@ az webapp config appsettings set \
 #### CI/CD Pipeline
 ```yaml
 # .github/workflows/deploy.yml
-name: Deploy GAMR Platform
+name: Deploy GAMRDIGITALE Platform
 
 on:
   push:
@@ -668,4 +668,4 @@ Pour toute question ou support, contactez l'équipe de développement.
 
 ---
 
-**GAMR Platform** - Gestion intelligente des risques avec IA prédictive 🛡️
+**GAMRDIGITALE Platform** - Gestion intelligente des risques avec IA prédictive 🛡️

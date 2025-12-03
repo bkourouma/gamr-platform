@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Azure Infrastructure Deployment Script using ARM Templates
-# This script deploys the GAMR Platform infrastructure using ARM templates
+# This script deploys the GAMRDIGITALE Platform infrastructure using ARM templates
 
 set -e
 
@@ -260,7 +260,7 @@ show_next_steps() {
 
 # Main execution
 main() {
-    log_info "Starting Azure infrastructure deployment for GAMR Platform"
+    log_info "Starting Azure infrastructure deployment for GAMRDIGITALE Platform"
     
     parse_args "$@"
     check_prerequisites

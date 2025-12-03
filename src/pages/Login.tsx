@@ -92,7 +92,7 @@ export const Login: React.FC = () => {
           <div className="text-center mb-12 space-y-6">
             <div className="space-y-6">
               <h1 className="text-5xl font-bold text-gray-800">
-                GAMR
+                GAMRDIGITALE
               </h1>
               <p className="text-xl text-gray-600 font-medium">
                 Plateforme Intelligente de Gestion des Risques
@@ -127,7 +127,7 @@ export const Login: React.FC = () => {
                     </div>
                     {/* Scale markers */}
                     <div className="flex justify-between mt-2 text-xs text-gray-600">
-                      <span>0</span>
+                      <span>1</span>
                       <span>10</span>
                       <span>20</span>
                       <span>30</span>
@@ -303,7 +303,7 @@ export const Login: React.FC = () => {
                 <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 h-full flex items-center justify-center shadow-lg">
                   <img
                     src="/images/logo.jpg"
-                    alt="GAMR Logo"
+                    alt="GAMRDIGITALE Logo"
                     className="w-64 h-64 object-contain rounded-lg"
                   />
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">

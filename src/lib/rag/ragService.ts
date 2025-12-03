@@ -97,7 +97,7 @@ export class RAGService {
   }
   
   private buildContext(searchResults: any[]): string {
-    let context = "Contexte basé sur les données GAMR:\n\n"
+    let context = "Contexte basé sur les données GAMRDIGITALE:\n\n"
     
     searchResults.forEach((result, index) => {
       context += `Document ${index + 1} (${result.document.metadata.type}):\n`
@@ -145,7 +145,7 @@ export class RAGService {
       r.document.metadata.riskSheet?.priority === 'HIGH'
     )
     
-    let response = `📊 **Analyse des risques GAMR**\n\n`
+    let response = `📊 **Analyse des risques GAMRDIGITALE**\n\n`
     
     if (criticalRisks.length > 0) {
       response += `🚨 **Risques critiques identifiés (${criticalRisks.length}):**\n`
@@ -223,7 +223,7 @@ export class RAGService {
   }
   
   private generateRecommendationResponse(query: string, searchResults: any[]): string {
-    let response = `💡 **Recommandations GAMR personnalisées**\n\n`
+    let response = `💡 **Recommandations GAMRDIGITALE personnalisées**\n\n`
     
     response += `**Amélioration de votre posture sécuritaire:**\n\n`
     response += `🔍 **Évaluations:**\n`
@@ -245,7 +245,7 @@ export class RAGService {
   }
   
   private generateGeneralResponse(query: string, searchResults: any[]): string {
-    let response = `Voici les informations que j'ai trouvées concernant "${query}" dans vos données GAMR:\n\n`
+    let response = `Voici les informations que j'ai trouvées concernant "${query}" dans vos données GAMRDIGITALE:\n\n`
     
     const typeCount = searchResults.reduce((acc, result) => {
       const type = result.document.metadata.type

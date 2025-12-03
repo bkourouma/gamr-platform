@@ -10,9 +10,9 @@ const API_BASE_URL = (import.meta.env.VITE_API_URL && String(import.meta.env.VIT
 
 // Log the API URL in development for debugging
 if (isDev) {
-  console.log('[GAMR API] Using API base URL:', API_BASE_URL)
-  console.log('[GAMR API] Current port:', window.location.port)
-  console.log('[GAMR API] Backend port from env:', import.meta.env.VITE_BACKEND_PORT || '3002 (default)')
+  console.log('[GAMRDIGITALE API] Using API base URL:', API_BASE_URL)
+  console.log('[GAMRDIGITALE API] Current port:', window.location.port)
+  console.log('[GAMRDIGITALE API] Backend port from env:', import.meta.env.VITE_BACKEND_PORT || '3002 (default)')
 }
 
 // Types pour les réponses API

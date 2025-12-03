@@ -206,7 +206,7 @@ export class DataExtractor {
   }
   
   private buildRiskSheetContent(riskSheet: any): string {
-    let content = `Fiche de risque GAMR\n`
+    let content = `Fiche de risque GAMRDIGITALE\n`
     content += `Cible: ${riskSheet.target}\n`
     content += `Scénario: ${riskSheet.scenario}\n`
     content += `Probabilité: ${riskSheet.probability}/3\n`

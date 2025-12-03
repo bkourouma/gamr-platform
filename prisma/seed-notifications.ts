@@ -67,7 +67,7 @@ async function seedNotifications() {
       },
       {
         title: '⚙️ Mise à Jour Système',
-        message: 'La plateforme GAMR a été mise à jour vers la version 3.1. Nouvelles fonctionnalités disponibles.',
+        message: 'La plateforme GAMRDIGITALE a été mise à jour vers la version 3.1. Nouvelles fonctionnalités disponibles.',
         type: 'SYSTEM',
         tenantId: techCorpTenant.id,
         userId: null,

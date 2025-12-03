@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# GAMR Platform - Script de configuration VPS (SANS affecter les autres apps)
+# GAMRDIGITALE Platform - Script de configuration VPS (SANS affecter les autres apps)
 # Sous-domaine: gamrdigitale.engage-360.net
 # Port: 3005
 # =============================================================================
@@ -14,7 +14,7 @@ PORT=3005
 REPO_URL="https://github.com/bkourouma/gamr-platform.git"
 
 echo "=========================================="
-echo "🚀 Configuration GAMR Platform"
+echo "🚀 Configuration GAMRDIGITALE Platform"
 echo "   Domaine: $DOMAIN"
 echo "   Port: $PORT"
 echo "   Répertoire: $APP_DIR"

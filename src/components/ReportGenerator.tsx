@@ -315,7 +315,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ isOpen, onClos
                 {reportType === 'risks' && (
                   <div>
                     <p>• Analyse détaillée des fiches de risques</p>
-                    <p>• Scores et métriques GAMR</p>
+                    <p>• Scores et métriques GAMRDIGITALE</p>
                     <p>• Graphiques de priorité</p>
                     <p>• Suggestions IA</p>
                   </div>

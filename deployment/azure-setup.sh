@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Azure Infrastructure Setup Script for GAMR Platform
+# Azure Infrastructure Setup Script for GAMRDIGITALE Platform
 # This script creates the necessary Azure resources for deployment
 
 set -e
@@ -221,7 +221,7 @@ show_summary() {
 
 # Main execution
 main() {
-    log_info "Starting Azure infrastructure setup for GAMR Platform"
+    log_info "Starting Azure infrastructure setup for GAMRDIGITALE Platform"
     
     check_azure_cli
     create_resource_group

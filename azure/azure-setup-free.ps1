@@ -1,4 +1,4 @@
-# Azure Infrastructure Setup Script for GAMR Platform (FREE/CHEAPEST Tiers)
+# Azure Infrastructure Setup Script for GAMRDIGITALE Platform (FREE/CHEAPEST Tiers)
 # This script creates Azure resources using the cheapest possible pricing tiers
 
 param(
@@ -59,7 +59,7 @@ try {
 }
 
 Write-Host ""
-Write-Host "=== Configuration Azure ECONOMIQUE pour GAMR Platform ===" -ForegroundColor Cyan
+Write-Host "=== Configuration Azure ECONOMIQUE pour GAMRDIGITALE Platform ===" -ForegroundColor Cyan
 Write-Cost "OPTIMISATION DES COUTS - Utilisation des tiers les moins chers"
 Write-Host "Configuration:"
 Write-Host "   Resource Group: $ResourceGroupName"
@@ -227,7 +227,7 @@ Write-Step "Creation des fichiers de configuration..."
 
 # Cost estimation
 $estimatedCost = @"
-# ESTIMATION DES COUTS MENSUELS - GAMR Platform
+# ESTIMATION DES COUTS MENSUELS - GAMRDIGITALE Platform
 
 ## Ressources et couts:
 
@@ -261,7 +261,7 @@ $estimatedCost | Out-File -FilePath "cost-estimation.txt" -Encoding UTF8
 
 # Azure config file
 $configContent = @"
-# Configuration Azure pour GAMR Platform (OPTIMISEE COUTS)
+# Configuration Azure pour GAMRDIGITALE Platform (OPTIMISEE COUTS)
 # Genere le $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 
 RESOURCE_GROUP=$ResourceGroupName

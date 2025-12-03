@@ -12,7 +12,7 @@ async function createTestData() {
       data: {
         name: 'Test Company',
         slug: 'test-company',
-        description: 'Test company for GAMR platform'
+        description: 'Test company for GAMRDIGITALE platform'
       }
     });
     console.log('Tenant created:', tenant.id);

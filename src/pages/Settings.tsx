@@ -213,7 +213,7 @@ export const Settings: React.FC = () => {
             <span>Paramètres</span>
           </h1>
           <p className="text-gray-600 mt-1">
-            Configurez votre expérience GAMR
+            Configurez votre expérience GAMRDIGITALE
           </p>
         </div>
       </div>

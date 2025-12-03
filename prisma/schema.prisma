@@ -1,4 +1,4 @@
-// Schéma Prisma pour la plateforme GAMR intelligente
+// Schéma Prisma pour la plateforme GAMRDIGITALE intelligente
 // Gestion multi-tenant avec isolation des données
 
 generator client {
@@ -81,12 +81,12 @@ enum UserRole {
   READER         // Lecteur (accès en lecture seule)
 }
 
-// ===== FICHES D'ANALYSE GAMR =====
+// ===== FICHES D'ANALYSE GAMRDIGITALE =====
 
 model RiskSheet {
   id          String   @id @default(cuid())
 
-  // Champs GAMR principaux
+  // Champs GAMRDIGITALE principaux
   target      String   // Cible potentielle
   scenario    String   // Scénario de menace
   probability Int      // Probabilité (1-3)
@@ -376,7 +376,7 @@ model Evaluation {
   evaluator   User     @relation(fields: [evaluatorId], references: [id])
   responses   Response[]
   attachments MediaAttachment[]
-  generatedRisks RiskSheet[] // Fiches GAMR générées automatiquement
+  generatedRisks RiskSheet[] // Fiches GAMRDIGITALE générées automatiquement
 
   // Métadonnées
   createdAt   DateTime @default(now())

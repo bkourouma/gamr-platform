@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script de déploiement GAMR Platform sur un VPS Hostinger totalement neuf
+# Script de déploiement GAMRDIGITALE Platform sur un VPS Hostinger totalement neuf
 # Usage: ./deploy-to-hostinger.sh <ip-vps> <domaine>
 
 # Vérifier les arguments
@@ -25,7 +25,7 @@ else
     echo "Vous devrez peut-être entrer le mot de passe lors des prochaines étapes."
 fi
 
-echo "🚀 Déploiement de GAMR Platform sur VPS Hostinger"
+echo "🚀 Déploiement de GAMRDIGITALE Platform sur VPS Hostinger"
 echo "------------------------------------------------"
 echo "IP du VPS: $VPS_IP"
 echo "Domaine: $DOMAIN"

@@ -1,4 +1,4 @@
-// Application Insights configuration for GAMR Platform
+// Application Insights configuration for GAMRDIGITALE Platform
 // Provides comprehensive monitoring, logging, and performance tracking
 
 const appInsights = require('applicationinsights');

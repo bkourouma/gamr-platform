@@ -102,7 +102,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }
 
-  // Navigation principale - Workflow GAMR dans l'ordre logique
+  // Navigation principale - Workflow GAMRDIGITALE dans l'ordre logique
   const mainWorkflowNavigation = [
     {
       name: 'Tableau de bord',
@@ -116,7 +116,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       href: '/chat',
       icon: MessageSquare,
       gradient: 'from-emerald-500 to-emerald-600',
-      description: 'Chat intelligent avec vos données GAMR',
+      description: 'Chat intelligent avec vos données GAMRDIGITALE',
       isAI: true
     },
     {
@@ -124,7 +124,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       href: '/templates',
       icon: Layers,
       gradient: 'from-purple-500 to-purple-600',
-      description: 'Modèles GAMR standardisés'
+      description: 'Modèles GAMRDIGITALE standardisés'
     },
     {
       name: 'Questionnaire',
@@ -135,7 +135,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       badge: '1'
     },
     {
-      name: 'GAMR',
+      name: 'GAMRDIGITALE',
       href: '/risks',
       icon: AlertTriangle,
       gradient: 'from-orange-500 to-orange-600',
@@ -224,13 +224,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="relative">
                 <img
                   src={logoGamr}
-                  alt="GAMR Logo"
+                  alt="GAMRDIGITALE Logo"
                   className="w-20 h-10 object-contain"
                 />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-accent-400 to-accent-500 rounded-full animate-pulse-soft"></div>
               </div>
               <div>
-                <span className="text-xl font-bold text-gradient">GAMR</span>
+                <span className="text-xl font-bold text-gradient">GAMRDIGITALE</span>
                 <div className="flex items-center space-x-1">
                   <Sparkles className="w-3 h-3 text-accent-500" />
                   <span className="text-xs text-gray-500 font-medium">Intelligence</span>
@@ -250,7 +250,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Workflow indicator */}
           <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-primary-50/50 to-accent-50/50">
             <div className="text-xs font-semibold text-primary-700 uppercase tracking-wide mb-1">
-              Processus GAMR
+              Processus GAMRDIGITALE
             </div>
             <div className="text-xs text-gray-600">
               Méthodologie d'Analyse des Menaces et Risques

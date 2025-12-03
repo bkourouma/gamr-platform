@@ -430,7 +430,7 @@ export const RiskSheetDetail: React.FC = () => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Fiche de risque #{risk.id}</h1>
-            <p className="text-gray-600">Détails de l'analyse GAMR</p>
+            <p className="text-gray-600">Détails de l'analyse GAMRDIGITALE</p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
@@ -494,12 +494,12 @@ export const RiskSheetDetail: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Évaluation GAMR */}
+          {/* Évaluation GAMRDIGITALE */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-primary-600" />
-                <span>Évaluation GAMR</span>
+                <span>Évaluation GAMRDIGITALE</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1110,12 +1110,12 @@ export const RiskSheetDetail: React.FC = () => {
           {/* Score et priorité */}
           <Card variant="gradient">
             <CardHeader>
-              <CardTitle>Résultat GAMR</CardTitle>
+              <CardTitle>Résultat GAMRDIGITALE</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <div>
                 <div className="text-4xl font-bold text-gray-900">{riskScore}/60</div>
-                <div className="text-sm text-gray-600">Score de risque GAMR</div>
+                <div className="text-sm text-gray-600">Score de risque GAMRDIGITALE</div>
               </div>
               
               <Badge className={`${priorityConfig.color} border`}>

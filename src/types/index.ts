@@ -1,4 +1,4 @@
-// Main types for the GAMR platform
+// Main types for the GAMRDIGITALE platform
 
 // User and Authentication types
 export interface User {

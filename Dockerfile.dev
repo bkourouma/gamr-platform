@@ -1,4 +1,4 @@
-# Development Dockerfile for GAMR Platform
+# Development Dockerfile for GAMRDIGITALE Platform
 # Optimized for development with hot reload
 
 FROM node:18-alpine

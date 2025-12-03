@@ -1,6 +1,6 @@
-# 🚀 Guide de Déploiement - GAMR Platform
+# 🚀 Guide de Déploiement - GAMRDIGITALE Platform
 
-Ce guide détaille le processus de déploiement complet de la plateforme GAMR en production.
+Ce guide détaille le processus de déploiement complet de la plateforme GAMRDIGITALE en production.
 
 ## 📋 Prérequis
 
@@ -303,4 +303,4 @@ az webapp log download --name gamr-platform --resource-group gamr-rg
 - [ ] Documentation mise à jour
 - [ ] Équipe formée sur les procédures
 
-🎉 **Félicitations !** Votre plateforme GAMR est maintenant déployée en production !
+🎉 **Félicitations !** Votre plateforme GAMRDIGITALE est maintenant déployée en production !

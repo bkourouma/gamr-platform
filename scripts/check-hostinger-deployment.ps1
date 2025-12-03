@@ -1,4 +1,4 @@
-# Script PowerShell pour vérifier le statut du déploiement GAMR sur Hostinger VPS
+# Script PowerShell pour vérifier le statut du déploiement GAMRDIGITALE sur Hostinger VPS
 # Usage: .\check-hostinger-deployment.ps1 -VpsIp <ip-vps> -Domain <domaine>
 
 param (
@@ -14,7 +14,7 @@ param (
 
 $AppDir = "/opt/gamr"
 
-Write-Host "🔍 Vérification du déploiement GAMR Platform sur VPS Hostinger" -ForegroundColor Cyan
+Write-Host "🔍 Vérification du déploiement GAMRDIGITALEDIGITALE Platform sur VPS Hostinger" -ForegroundColor Cyan
 Write-Host "------------------------------------------------"
 Write-Host "IP du VPS: $VpsIp"
 if ($Domain) { Write-Host "Domaine: $Domain" }

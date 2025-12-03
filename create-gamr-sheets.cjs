@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-// Fonction pour calculer le score GAMR (formule classique)
+// Fonction pour calculer le score GAMRDIGITALE (formule classique)
 function calculateRiskScore(probability, vulnerability, impact) {
   return probability * vulnerability * impact
 }
@@ -17,7 +17,7 @@ function calculatePriority(score) {
 }
 
 async function createGamrSheets() {
-  console.log('🎯 Création de 5 nouvelles fiches GAMR...')
+  console.log('🎯 Création de 5 nouvelles fiches GAMRDIGITALE...')
 
   try {
     // Récupérer les tenants et utilisateurs existants
@@ -40,7 +40,7 @@ async function createGamrSheets() {
 
     console.log(`📋 ${tenants.length} tenant(s) trouvé(s)`)
 
-    // Définir les 5 nouvelles fiches GAMR avec différentes catégories
+    // Définir les 5 nouvelles fiches GAMRDIGITALE avec différentes catégories
     const newRiskSheets = [
       {
         target: 'Système de climatisation du data center',
@@ -191,7 +191,7 @@ async function createGamrSheets() {
       }
     }
 
-    console.log(`\n🎉 ${createdSheets.length} nouvelles fiches GAMR créées avec succès!`)
+    console.log(`\n🎉 ${createdSheets.length} nouvelles fiches GAMRDIGITALE créées avec succès!`)
     
     // Afficher un résumé par catégorie
     const categorySummary = {}
@@ -222,7 +222,7 @@ async function createGamrSheets() {
     })
 
   } catch (error) {
-    console.error('❌ Erreur lors de la création des fiches GAMR:', error)
+    console.error('❌ Erreur lors de la création des fiches GAMRDIGITALE:', error)
   } finally {
     await prisma.$disconnect()
   }

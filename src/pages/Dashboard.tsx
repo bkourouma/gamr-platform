@@ -41,11 +41,11 @@ export const Dashboard: React.FC = () => {
           actionsApi.getStats()
         ])
         
-        // Utiliser le nouveau calcul de l'Indice Global de Sécurité GAMR (échelle 1-60)
-        // Sinon, utiliser l'ancien averageRiskScore (déjà sur échelle GAMR 1-60)
+        // Utiliser le nouveau calcul de l'Indice Global de Sécurité GAMRDIGITALE (échelle 1-60)
+        // Sinon, utiliser l'ancien averageRiskScore (déjà sur échelle GAMRDIGITALE 1-60)
         const index = riskStats.averageSecurityIndex !== undefined 
           ? riskStats.averageSecurityIndex 
-          : (riskStats.averageRiskScore || 1) // Déjà sur échelle GAMR 1-60
+          : (riskStats.averageRiskScore || 1) // Déjà sur échelle GAMRDIGITALE 1-60
         setSecurityIndex(Math.round(index))
         
         if (riskStats.securityIndexDetails) {
@@ -74,8 +74,8 @@ export const Dashboard: React.FC = () => {
       gradient: 'from-success-500 to-success-600',
       bgGradient: 'from-success-50 to-success-100',
       description: securityIndexDetails 
-        ? `Éval: ${securityIndexDetails.evaluationScore.toFixed(1)} | Actions: ${securityIndexDetails.correctiveActionCoverage.toFixed(1)} | Résolution: ${securityIndexDetails.criticalRisksResolutionRate.toFixed(1)} (échelle GAMR 1-60)`
-        : 'Indice GAMR basé sur évaluations (40%), actions correctives (30%), résolution risques critiques (20%) et conformité (10%). Échelle: 1-60 (1-15=Faible, 45-60=Élevé)'
+        ? `Éval: ${securityIndexDetails.evaluationScore.toFixed(1)} | Actions: ${securityIndexDetails.correctiveActionCoverage.toFixed(1)} | Résolution: ${securityIndexDetails.criticalRisksResolutionRate.toFixed(1)} (échelle GAMRDIGITALE 1-60)`
+        : 'Indice GAMRDIGITALE basé sur évaluations (40%), actions correctives (30%), résolution risques critiques (20%) et conformité (10%). Échelle: 1-60 (1-15=Faible, 45-60=Élevé)'
     },
     {
       name: 'Risques actifs',
@@ -293,7 +293,7 @@ export const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle size="lg" gradient>Risques récents</CardTitle>
-                <CardDescription>Dernières analyses GAMR créées</CardDescription>
+                <CardDescription>Dernières analyses GAMRDIGITALE créées</CardDescription>
               </div>
               <div className="flex items-center space-x-2 px-3 py-1 bg-white/60 rounded-full">
                 <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse-soft"></div>

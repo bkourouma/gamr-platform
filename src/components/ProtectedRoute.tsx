@@ -27,7 +27,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             <Loader2 className="w-6 h-6 text-accent-600 animate-spin absolute -top-1 -right-1" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">GAMR</h2>
+            <h2 className="text-xl font-semibold text-gray-900">GAMRDIGITALE</h2>
             <p className="text-gray-600">Vérification de l'authentification...</p>
           </div>
         </div>

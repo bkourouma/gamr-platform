@@ -338,7 +338,7 @@ export class EvaluationScoringEngine {
   }
 
   /**
-   * Génère automatiquement des fiches GAMR depuis l'évaluation
+   * Génère automatiquement des fiches GAMRDIGITALE depuis l'évaluation
    */
   public generateRiskSheets(
     evaluationResult: ScoringResult,

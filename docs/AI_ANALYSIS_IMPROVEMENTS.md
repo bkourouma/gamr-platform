@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble des améliorations
 
-Le système d'analyse IA pour les fiches de risques GAMR a été considérablement amélioré pour être plus **dense**, **robuste** et **intuitif**. Les améliorations portent sur trois axes principaux :
+Le système d'analyse IA pour les fiches de risques GAMRDIGITALE a été considérablement amélioré pour être plus **dense**, **robuste** et **intuitif**. Les améliorations portent sur trois axes principaux :
 
 ### 🎯 1. Analyse plus dense et détaillée
 
@@ -185,5 +185,5 @@ Points positifs:
 
 ---
 
-**Version 2.0 - Système d'Analyse IA GAMR**
+**Version 2.0 - Système d'Analyse IA GAMRDIGITALE**
 *Plus dense, plus robuste, plus intuitif*

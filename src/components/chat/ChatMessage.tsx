@@ -156,7 +156,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-4">
           <span className="font-semibold text-base text-gray-900">
-            {isUser ? 'Vous' : 'Assistant GAMR'}
+            {isUser ? 'Vous' : 'Assistant GAMRDIGITALE'}
           </span>
           <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
             {formatDistanceToNow(message.timestamp, { addSuffix: true, locale: fr })}

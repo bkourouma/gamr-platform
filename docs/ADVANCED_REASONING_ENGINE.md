@@ -1,8 +1,8 @@
-# Moteur de Raisonnement Avancé GAMR - Version 3.0
+# Moteur de Raisonnement Avancé GAMRDIGITALE - Version 3.0
 
 ## Vue d'ensemble révolutionnaire
 
-Le nouveau **Moteur de Raisonnement Avancé GAMR** représente une évolution majeure dans l'analyse des risques. Contrairement aux approches précédentes qui analysaient les évaluations de manière isolée, ce moteur utilise le **contexte complet de toutes les évaluations** pour générer des insights sophistiqués et des recommandations de haute qualité.
+Le nouveau **Moteur de Raisonnement Avancé GAMRDIGITALE** représente une évolution majeure dans l'analyse des risques. Contrairement aux approches précédentes qui analysaient les évaluations de manière isolée, ce moteur utilise le **contexte complet de toutes les évaluations** pour générer des insights sophistiqués et des recommandations de haute qualité.
 
 ## 🧠 Architecture du moteur de raisonnement
 
@@ -251,5 +251,5 @@ AdvancedRiskReasoningEngine
 
 ---
 
-**Moteur de Raisonnement Avancé GAMR v3.0**
+**Moteur de Raisonnement Avancé GAMRDIGITALE v3.0**
 *L'intelligence artificielle au service de l'analyse des risques*

@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Restart GAMR Platform dev servers
+REM Restart GAMRDIGITALE Platform dev servers
 REM - Ensures ports are free before launching
 REM - Defaults: backend 3002, frontend 5173
 REM Usage: restart-dev.bat [BACK_PORT] [FRONT_PORT]
@@ -72,10 +72,10 @@ REM Change directory to project root (this script is in scripts\)
 cd /d "%~dp0.."
 
 REM Start backend (server) in a background window with specified port
-start "GAMR Backend" cmd /c "set PORT=%BACK_PORT% && npm run server:dev"
+start "GAMRDIGITALE Backend" cmd /c "set PORT=%BACK_PORT% && npm run server:dev"
 
 REM Start frontend (Vite) in a background window with specified port and proxy target
-start "GAMR Frontend" cmd /c "set PORT=%FRONT_PORT% && set VITE_PORT=%FRONT_PORT% && set BACKEND_PORT=%BACK_PORT% && set VITE_PROXY_TARGET=http://localhost:%BACK_PORT% && npm run dev"
+start "GAMRDIGITALE Frontend" cmd /c "set PORT=%FRONT_PORT% && set VITE_PORT=%FRONT_PORT% && set BACKEND_PORT=%BACK_PORT% && set VITE_PROXY_TARGET=http://localhost:%BACK_PORT% && npm run dev"
 
 echo.
 echo Backend and frontend launched. You can close this window.

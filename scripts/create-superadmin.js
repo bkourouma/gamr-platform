@@ -20,9 +20,9 @@ async function createSuperAdmin() {
       where: { slug: 'gamr-admin' },
       update: {},
       create: {
-        name: 'GAMR Administration',
+        name: 'GAMRDIGITALE Administration',
         slug: 'gamr-admin',
-        description: 'Tenant administratif pour la gestion de la plateforme GAMR',
+        description: 'Tenant administratif pour la gestion de la plateforme GAMRDIGITALE',
         sector: 'Technologie',
         size: 'ETI',
         location: 'France',

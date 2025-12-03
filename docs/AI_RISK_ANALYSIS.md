@@ -1,4 +1,4 @@
-# Système d'Analyse IA pour les Fiches de Risques GAMR
+# Système d'Analyse IA pour les Fiches de Risques GAMRDIGITALE
 
 ## Vue d'ensemble
 
@@ -8,7 +8,7 @@ Le système d'analyse IA pour les fiches de risques GAMR utilise les réponses a
 
 ### 🧠 Analyse IA Intelligente
 - **Analyse contextuelle** basée sur les réponses aux questionnaires d'évaluation
-- **Recommandations personnalisées** pour chaque critère GAMR
+- **Recommandations personnalisées** pour chaque critère GAMRDIGITALE
 - **Explications détaillées** avec points positifs et négatifs
 - **Niveau de confiance** pour chaque recommandation
 

@@ -1,4 +1,4 @@
-// Deployment validation script for GAMR Platform
+// Deployment validation script for GAMRDIGITALE Platform
 // Comprehensive testing of deployed application functionality
 
 const axios = require('axios');

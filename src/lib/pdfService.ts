@@ -22,7 +22,7 @@ export class PDFService {
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(18)
     doc.setFont('helvetica', 'bold')
-    doc.text('GAMR - Gestion Intelligente des Risques', 20, 15)
+    doc.text('GAMRDIGITALE - Gestion Intelligente des Risques', 20, 15)
     
     // Sous-titre
     doc.setFontSize(12)
@@ -48,7 +48,7 @@ export class PDFService {
     doc.text(`Page ${pageNumber} sur ${totalPages}`, 20, pageHeight - 10)
     
     // Informations de confidentialité
-    doc.text('Document confidentiel - GAMR Platform', 105, pageHeight - 10, { align: 'center' })
+    doc.text('Document confidentiel - GAMRDIGITALE Platform', 105, pageHeight - 10, { align: 'center' })
     
     // Date et heure
     const now = new Date()
@@ -158,7 +158,7 @@ export class PDFService {
     doc.setTextColor(0, 0, 0)
     doc.setFontSize(16)
     doc.setFont('helvetica', 'bold')
-    doc.text('Analyse de Risque GAMR', 20, yPosition)
+    doc.text('Analyse de Risque GAMRDIGITALE', 20, yPosition)
     yPosition += 15
 
     // Cible du risque
@@ -630,7 +630,7 @@ export class PDFService {
     let yPosition = 35
 
     // En-tête
-    this.addHeader(doc, 'Rapport d\'Évaluation GAMR')
+    this.addHeader(doc, 'Rapport d\'Évaluation GAMRDIGITALE')
 
     // Informations principales
     doc.setTextColor(0, 0, 0)
@@ -739,7 +739,7 @@ export class PDFService {
     let yPosition = 35
 
     // En-tête
-    this.addHeader(doc, data.title || 'Rapport Consolidé GAMR')
+    this.addHeader(doc, data.title || 'Rapport Consolidé GAMRDIGITALE')
 
     // Résumé exécutif
     doc.setTextColor(0, 0, 0)

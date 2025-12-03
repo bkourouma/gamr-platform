@@ -34,7 +34,7 @@ async function seedGoldMinesEvaluations() {
     // Récupérer les modèles d'évaluation
     const completeModel = await prisma.evaluationTemplate.findFirst({
       where: {
-        name: 'GAMR - Évaluation Sécuritaire Complète (42 Objectifs)',
+        name: 'GAMRDIGITALE - Évaluation Sécuritaire Complète (42 Objectifs)',
         tenantId: tenant.id
       },
       include: {
@@ -52,7 +52,7 @@ async function seedGoldMinesEvaluations() {
 
     const propertyModel = await prisma.evaluationTemplate.findFirst({
       where: {
-        name: 'GAMR - Évaluation Sécurité des Biens',
+        name: 'GAMRDIGITALE - Évaluation Sécurité des Biens',
         tenantId: tenant.id
       },
       include: {
@@ -70,7 +70,7 @@ async function seedGoldMinesEvaluations() {
 
     const personnelModel = await prisma.evaluationTemplate.findFirst({
       where: {
-        name: 'GAMR - Évaluation Sécurité des Personnes',
+        name: 'GAMRDIGITALE - Évaluation Sécurité des Personnes',
         tenantId: tenant.id
       },
       include: {

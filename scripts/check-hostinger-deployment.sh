@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script de vérification du déploiement GAMR sur VPS Hostinger
+# Script de vérification du déploiement GAMRDIGITALE sur VPS Hostinger
 # Usage: ./check-hostinger-deployment.sh <ip-vps> [domaine]
 
 # Vérifier les arguments
@@ -14,7 +14,7 @@ DOMAIN=$2
 SSH_USER="root"
 APP_DIR="/opt/gamr"
 
-echo -e "\e[36m🔍 Vérification du déploiement GAMR Platform sur VPS Hostinger\e[0m"
+echo -e "\e[36m🔍 Vérification du déploiement GAMRDIGITALEDIGITALE Platform sur VPS Hostinger\e[0m"
 echo "------------------------------------------------"
 echo "IP du VPS: $VPS_IP"
 if [ ! -z "$DOMAIN" ]; then echo "Domaine: $DOMAIN"; fi

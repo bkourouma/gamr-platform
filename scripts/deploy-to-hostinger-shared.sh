@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script de déploiement GAMR Platform sur VPS Hostinger partagé
+# Script de déploiement GAMRDIGITALE Platform sur VPS Hostinger partagé
 # Usage: ./deploy-to-hostinger-shared.sh <ip-vps> <domaine> [répertoire-app]
 
 # Vérifier les arguments
@@ -15,7 +15,7 @@ SSH_USER="root"
 APP_DIR=${3:-"/opt/gamr"}
 CURRENT_DIR=$(pwd)
 
-echo "🚀 Déploiement de GAMR Platform sur VPS Hostinger partagé"
+echo "🚀 Déploiement de GAMRDIGITALE Platform sur VPS Hostinger partagé"
 echo "------------------------------------------------"
 echo "IP du VPS: $VPS_IP"
 echo "Domaine: $DOMAIN"
@@ -138,7 +138,7 @@ CONTAINER_NAME="gamr-platform-$(echo $DOMAIN | tr '.' '-')"
 ssh $SSH_USER@$VPS_IP << EOF
 # Créer un fichier de configuration Nginx spécifique pour ce domaine
 cat > $APP_DIR/nginx-$DOMAIN.conf << EOT
-# Configuration Nginx pour GAMR Platform - $DOMAIN
+# Configuration Nginx pour GAMRDIGITALE Platform - $DOMAIN
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;

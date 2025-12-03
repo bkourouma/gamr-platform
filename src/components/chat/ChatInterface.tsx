@@ -38,7 +38,7 @@ export function ChatInterface() {
       <div className="flex items-center justify-between p-4 border-b bg-gray-50">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-blue-600" />
-          <h2 className="font-semibold text-gray-900">Assistant IA GAMR</h2>
+          <h2 className="font-semibold text-gray-900">Assistant IA GAMRDIGITALE</h2>
         </div>
         <button
           onClick={clearChat}
@@ -56,7 +56,7 @@ export function ChatInterface() {
             <div>
               <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Bienvenue dans l'Assistant GAMR
+                Bienvenue dans l'Assistant GAMRDIGITALE
               </h3>
               <p className="text-gray-600 mb-4">
                 Posez-moi des questions sur vos évaluations, fiches de risques et actions correctives.
@@ -105,7 +105,7 @@ export function ChatInterface() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Posez votre question sur vos données GAMR..."
+            placeholder="Posez votre question sur vos données GAMRDIGITALE..."
             className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={1}
             disabled={isLoading}

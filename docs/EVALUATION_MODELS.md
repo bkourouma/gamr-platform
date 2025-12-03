@@ -1,10 +1,10 @@
-# Modèles d'Évaluation GAMR
+# Modèles d'Évaluation GAMRDIGITALE
 
-Ce document décrit les 3 modèles d'évaluation sécuritaire disponibles dans la plateforme GAMR.
+Ce document décrit les 3 modèles d'évaluation sécuritaire disponibles dans la plateforme GAMRDIGITALE.
 
 ## Vue d'ensemble
 
-La plateforme GAMR propose 3 modèles d'évaluation spécialisés basés sur les 42 objectifs de diagnostic sécuritaire :
+La plateforme GAMRDIGITALE propose 3 modèles d'évaluation spécialisés basés sur les 42 objectifs de diagnostic sécuritaire :
 
 1. **Modèle Complet** - Évaluation complète avec tous les 42 objectifs
 2. **Modèle Sécurité des Biens** - Spécialisé pour les infrastructures et équipements
@@ -13,7 +13,7 @@ La plateforme GAMR propose 3 modèles d'évaluation spécialisés basés sur les
 ## 1. Modèle Complet (42 Objectifs)
 
 **ID:** `gamr-complete-security-v1`
-**Titre:** GAMR - Évaluation Sécuritaire Complète (42 Objectifs)
+**Titre:** GAMRDIGITALE - Évaluation Sécuritaire Complète (42 Objectifs)
 
 ### Description
 Questionnaire complet d'évaluation des risques sécuritaires couvrant tous les aspects de la sécurité des biens et des personnes.
@@ -40,7 +40,7 @@ Questionnaire complet d'évaluation des risques sécuritaires couvrant tous les 
 ## 2. Modèle Sécurité des Biens
 
 **ID:** `gamr-property-security-v1`
-**Titre:** GAMR - Évaluation Sécurité des Biens
+**Titre:** GAMRDIGITALE - Évaluation Sécurité des Biens
 
 ### Description
 Questionnaire spécialisé pour l'évaluation de la sécurité des biens, infrastructures et équipements.
@@ -70,7 +70,7 @@ Questionnaire spécialisé pour l'évaluation de la sécurité des biens, infras
 ## 3. Modèle Sécurité des Personnes
 
 **ID:** `gamr-personnel-security-v1`
-**Titre:** GAMR - Évaluation Sécurité des Personnes
+**Titre:** GAMRDIGITALE - Évaluation Sécurité des Personnes
 
 ### Description
 Questionnaire spécialisé pour l'évaluation de la sécurité des personnes, formation et procédures.

@@ -9,7 +9,7 @@ export const ReportsDashboard: React.FC = () => {
   const reportTypes = [
     {
       id: 'risks',
-      title: 'GAMR',
+      title: 'GAMRDIGITALE',
       description: 'Analyse complète des risques identifiés',
       icon: FileText,
       color: 'from-blue-500 to-blue-600',
@@ -28,7 +28,7 @@ export const ReportsDashboard: React.FC = () => {
     {
       id: 'evaluations',
       title: 'Questionnaire',
-      description: 'Résultats des questionnaires GAMR',
+      description: 'Résultats des questionnaires GAMRDIGITALE',
       icon: BarChart3,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'from-purple-50 to-purple-100',
@@ -48,7 +48,7 @@ export const ReportsDashboard: React.FC = () => {
   const recentReports = [
     {
       name: 'Rapport Mensuel - Janvier 2024',
-      type: 'GAMR',
+      type: 'GAMRDIGITALE',
       date: '2024-01-15',
       size: '2.4 MB'
     },

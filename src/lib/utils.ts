@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Calcul du score de risque GAMR (formule classique)
+// Calcul du score de risque GAMRDIGITALE (formule classique)
 export function calculateRiskScore(probability: number, vulnerability: number, impact: number): number {
   // Formule classique sans normalisation: P × V × I
   // Score maximum possible: 3 × 4 × 5 = 60

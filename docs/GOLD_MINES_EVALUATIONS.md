@@ -15,7 +15,7 @@
 - **Titre :** Évaluation Sécuritaire Complète - Gold Mines Inc - Janvier 2024
 - **Type :** Modèle complet (42 objectifs)
 - **Statut :** Terminée
-- **Score GAMR :** 72/100
+- **Score GAMRDIGITALE :** 72/100
 - **Niveau de risque :** MEDIUM
 - **Réponses :** 62 questions complétées
 - **Description :** Évaluation exhaustive de tous les aspects sécuritaires du site principal
@@ -24,7 +24,7 @@
 - **Titre :** Audit Sécurité Infrastructures - Gold Mines Inc - Q1 2024
 - **Type :** Modèle sécurité des biens
 - **Statut :** Terminée
-- **Score GAMR :** 45/100
+- **Score GAMRDIGITALE :** 45/100
 - **Niveau de risque :** HIGH
 - **Réponses :** 35 questions complétées
 - **Description :** Audit trimestriel des infrastructures et équipements de sécurité
@@ -34,7 +34,7 @@
 - **Titre :** Évaluation Périmètre et Accès - Gold Mines Inc - Février 2024
 - **Type :** Modèle sécurité des biens
 - **Statut :** Terminée
-- **Score GAMR :** 68/100
+- **Score GAMRDIGITALE :** 68/100
 - **Niveau de risque :** MEDIUM
 - **Réponses :** 35 questions complétées
 - **Description :** Contrôle spécialisé du périmètre et des points d'accès
@@ -44,7 +44,7 @@
 - **Titre :** Audit Systèmes Critiques - Gold Mines Inc - Mars 2024
 - **Type :** Modèle sécurité des biens
 - **Statut :** Terminée
-- **Score GAMR :** 85/100
+- **Score GAMRDIGITALE :** 85/100
 - **Niveau de risque :** LOW
 - **Réponses :** 35 questions complétées
 - **Description :** Vérification des systèmes électriques et de surveillance
@@ -54,7 +54,7 @@
 - **Titre :** Évaluation Sécurité du Personnel - Gold Mines Inc - Janvier 2024
 - **Type :** Modèle sécurité des personnes
 - **Statut :** Terminée
-- **Score GAMR :** 78/100
+- **Score GAMRDIGITALE :** 78/100
 - **Niveau de risque :** MEDIUM
 - **Réponses :** 18 questions complétées
 - **Description :** Audit des conditions de travail et formation du personnel
@@ -112,7 +112,7 @@
 # Créer les évaluations Gold Mines Inc
 npm run db:seed-gold-mines
 
-# Voir toutes les évaluations dans l'interface GAMR
+# Voir toutes les évaluations dans l'interface GAMRDIGITALE
 # Naviguer vers : Évaluations > Gold Mines Inc
 ```
 
@@ -129,4 +129,4 @@ npm run db:seed-gold-mines
 ✅ **Scores différenciés** : Reflet de différents niveaux de risque  
 ✅ **Métadonnées enrichies** : Informations contextuelles complètes  
 
-Les évaluations de Gold Mines Inc sont maintenant disponibles dans votre plateforme GAMR pour démonstration et tests ! 🎉
+Les évaluations de Gold Mines Inc sont maintenant disponibles dans votre plateforme GAMRDIGITALE pour démonstration et tests ! 🎉

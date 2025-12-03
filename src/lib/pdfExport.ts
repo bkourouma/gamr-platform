@@ -20,7 +20,7 @@ export class PDFExportService {
     // Logo ou en-tête de l'entreprise
     this.doc.setFontSize(20)
     this.doc.setFont('helvetica', 'bold')
-    this.doc.text('GAMR - Rapport d\'Évaluation Sécuritaire', this.margin, this.currentY)
+    this.doc.text('GAMRDIGITALE - Rapport d\'Évaluation Sécuritaire', this.margin, this.currentY)
     this.currentY += 15
 
     // Ligne de séparation

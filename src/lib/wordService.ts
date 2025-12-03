@@ -29,7 +29,7 @@ export class WordService {
             // Title
             new Paragraph({
               children: [
-                new TextRun({ text: sanitize(options.title || 'Rapport Consolidé GAMR — Risques et Actions'), bold: true, size: 40 })
+                new TextRun({ text: sanitize(options.title || 'Rapport Consolidé GAMRDIGITALE — Risques et Actions'), bold: true, size: 40 })
               ],
             }),
             new Paragraph({
@@ -60,7 +60,7 @@ export class WordService {
     })
 
     const blob = await Packer.toBlob(doc)
-    const fileName = `Rapport_GAMR_Risques_Actions_${new Date().toISOString().split('T')[0]}.docx`
+    const fileName = `Rapport_GAMRDIGITALE_Risques_Actions_${new Date().toISOString().split('T')[0]}.docx`
     // Ensure correct MIME type for Word documents to avoid corruption issues when opening in MS Word
     const typedBlob = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
     saveAs(typedBlob, fileName)

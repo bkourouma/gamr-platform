@@ -1,4 +1,4 @@
-# 🚀 Déploiement GAMR Platform sur Hostinger VPS
+# 🚀 Déploiement GAMRDIGITALE Platform sur Hostinger VPS
 
 ## Informations
 - **Domaine**: gamrdigitale.engage-360.net

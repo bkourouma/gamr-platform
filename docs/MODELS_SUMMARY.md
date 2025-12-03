@@ -1,9 +1,9 @@
-# Résumé des Modèles d'Évaluation GAMR
+# Résumé des Modèles d'Évaluation GAMRDIGITALE
 
 ## ✅ Modèles créés avec succès
 
 ### 1. Modèle Complet (42 Objectifs)
-- **Nom:** GAMR - Évaluation Sécuritaire Complète (42 Objectifs)
+- **Nom:** GAMRDIGITALE - Évaluation Sécuritaire Complète (42 Objectifs)
 - **ID:** `gamr-complete-security-v1`
 - **Sections:** 11
 - **Objectifs:** 26 (sur les 42 prévus)
@@ -11,7 +11,7 @@
 - **Description:** Questionnaire complet couvrant tous les aspects de la sécurité
 
 ### 2. Modèle Sécurité des Biens
-- **Nom:** GAMR - Évaluation Sécurité des Biens
+- **Nom:** GAMRDIGITALE - Évaluation Sécurité des Biens
 - **ID:** `gamr-property-security-v1`
 - **Sections:** 5
 - **Objectifs:** 8
@@ -19,7 +19,7 @@
 - **Focus:** Infrastructures, équipements, bâtiments, systèmes critiques
 
 ### 3. Modèle Sécurité des Personnes
-- **Nom:** GAMR - Évaluation Sécurité des Personnes
+- **Nom:** GAMRDIGITALE - Évaluation Sécurité des Personnes
 - **ID:** `gamr-personnel-security-v1`
 - **Sections:** 4
 - **Objectifs:** 8
@@ -111,4 +111,4 @@ Les objectifs suivants peuvent être ajoutés au modèle complet :
 - **Multi-tenant** : Installation automatique pour tous les tenants
 - **Documentation** : Guide complet d'utilisation
 
-Les 3 modèles d'évaluation GAMR sont maintenant opérationnels et prêts à être utilisés dans la plateforme !
+Les 3 modèles d'évaluation GAMRDIGITALE sont maintenant opérationnels et prêts à être utilisés dans la plateforme !

@@ -81,7 +81,7 @@ function clean(value: string | undefined): string {
 async function main() {
   const prisma = new PrismaClient()
   const tenantName = process.env.TENANT_NAME || 'TechCorp Solutions'
-  const csvPath = path.resolve(process.cwd(), 'docs', 'GAMR_questions_full.csv')
+  const csvPath = path.resolve(process.cwd(), 'docs', 'GAMRDIGITALE_questions_full.csv')
 
   console.log(`Using tenant: ${tenantName}`)
   console.log(`Reading CSV: ${csvPath}`)
@@ -132,7 +132,7 @@ async function main() {
   }
 
   const now = new Date()
-  const templateName = `GAMR Questionnaire (Imported ${now.toISOString().slice(0, 10)})`
+  const templateName = `GAMRDIGITALE Questionnaire (Imported ${now.toISOString().slice(0, 10)})`
 
   console.log(`Creating template: ${templateName}`)
 
@@ -162,7 +162,7 @@ async function main() {
   await prisma.evaluationTemplate.create({
     data: {
       name: templateName,
-      description: 'Imported from GAMR_questions_full.csv',
+      description: 'Imported from GAMRDIGITALE_questions_full.csv',
       version: '1.0',
       isActive: true,
       isDefault: true,

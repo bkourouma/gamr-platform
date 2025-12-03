@@ -1,4 +1,4 @@
-// Security configuration for GAMR Platform
+// Security configuration for GAMRDIGITALE Platform
 // Implements comprehensive security measures for production deployment
 
 const helmet = require('helmet');

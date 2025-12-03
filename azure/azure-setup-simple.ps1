@@ -1,5 +1,5 @@
-# Azure Infrastructure Setup Script for GAMR Platform (PowerShell - Simple Version)
-# This script creates all necessary Azure resources for the GAMR platform
+# Azure Infrastructure Setup Script for GAMRDIGITALE Platform (PowerShell - Simple Version)
+# This script creates all necessary Azure resources for the GAMRDIGITALE platform
 
 param(
     [string]$ResourceGroupName = "gamr-platform-rg",
@@ -54,7 +54,7 @@ try {
 }
 
 Write-Host ""
-Write-Host "=== Demarrage de la configuration Azure pour GAMR Platform ===" -ForegroundColor Cyan
+Write-Host "=== Demarrage de la configuration Azure pour GAMRDIGITALE Platform ===" -ForegroundColor Cyan
 Write-Host "Configuration:"
 Write-Host "   Resource Group: $ResourceGroupName"
 Write-Host "   Location: $Location"
@@ -205,7 +205,7 @@ Write-Step "Creation des fichiers de configuration..."
 
 # Azure config file
 $configContent = @"
-# Configuration Azure pour GAMR Platform
+# Configuration Azure pour GAMRDIGITALE Platform
 # Genere le $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 
 RESOURCE_GROUP=$ResourceGroupName

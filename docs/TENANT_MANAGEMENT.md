@@ -1,8 +1,8 @@
-# Gestion des Tenants - GAMR Platform
+# Gestion des Tenants - GAMRDIGITALE Platform
 
 ## Vue d'ensemble
 
-La fonctionnalité de gestion des tenants permet aux **Super Administrateurs** uniquement de créer, modifier, visualiser et gérer les organisations (tenants) sur la plateforme GAMR.
+La fonctionnalité de gestion des tenants permet aux **Super Administrateurs** uniquement de créer, modifier, visualiser et gérer les organisations (tenants) sur la plateforme GAMRDIGITALE.
 
 ## Fonctionnalités
 

@@ -1,4 +1,4 @@
-// Modèle de raisonnement avancé pour l'analyse des risques GAMR
+// Modèle de raisonnement avancé pour l'analyse des risques GAMRDIGITALE
 // Utilise le contexte complet de toutes les évaluations pour une analyse sophistiquée
 
 interface EvaluationContext {

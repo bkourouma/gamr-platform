@@ -3,29 +3,29 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export interface SecurityIndexComponents {
-  evaluationScore: number        // Score Évaluations (1-60 selon méthodologie GAMR)
+  evaluationScore: number        // Score Évaluations (1-60 selon méthodologie GAMRDIGITALE)
   correctiveActionCoverage: number  // Couverture Actions Correctives (1-60)
   criticalRisksResolutionRate: number  // Taux Résolution Risques Critiques (1-60)
   securityObjectivesCompliance: number  // Conformité Objectifs Sécurité (1-60)
-  globalSecurityIndex: number    // Indice Global GAMR (1-60)
+  globalSecurityIndex: number    // Indice Global GAMRDIGITALE (1-60)
 }
 
 /**
- * Service pour calculer l'Indice Global de Sécurité selon la méthodologie GAMR
- * L'indice GAMR s'étend de 1 à 60, avec :
+ * Service pour calculer l'Indice Global de Sécurité selon la méthodologie GAMRDIGITALE
+ * L'indice GAMRDIGITALE s'étend de 1 à 60, avec :
  * - 1-15 : Risque Faible (Sécurité satisfaisante)
  * - 15-30 : Risque Moyen-Faible (Sécurité acceptable)
  * - 30-45 : Risque Moyen-Élevé (Sécurité préoccupante)
  * - 45-60 : Risque Élevé (Sécurité critique)
  * 
  * Algorithme de calcul :
- * Indice de Sécurité GAMR = (
+ * Indice de Sécurité GAMRDIGITALE = (
  *   Score Évaluations × 40% +
  *   Couverture Actions Correctives × 30% +
  *   Taux Résolution Risques Critiques × 20% +
  *   Conformité Objectifs Sécurité × 10%
  * )
- * Tous les composants sont normalisés sur l'échelle GAMR (1-60)
+ * Tous les composants sont normalisés sur l'échelle GAMRDIGITALE (1-60)
  */
 export class SecurityIndexService {
   /**
@@ -115,14 +115,14 @@ export class SecurityIndexService {
     // Basé sur le ratio d'actions complétées par rapport aux actions planifiées pour les risques critiques
     const securityObjectivesCompliance = this.calculateSecurityObjectivesCompliance(criticalRisks)
 
-    // 5. Calculer l'Indice Global pondéré (sur échelle GAMR 1-60)
+    // 5. Calculer l'Indice Global pondéré (sur échelle GAMRDIGITALE 1-60)
     const globalSecurityIndex = 
       evaluationScore * 0.40 +
       correctiveActionCoverage * 0.30 +
       criticalRisksResolutionRate * 0.20 +
       securityObjectivesCompliance * 0.10
 
-    // S'assurer que l'indice est dans la plage GAMR (1-60)
+    // S'assurer que l'indice est dans la plage GAMRDIGITALE (1-60)
     const clampedIndex = Math.max(1, Math.min(60, globalSecurityIndex))
 
     return {
@@ -136,27 +136,27 @@ export class SecurityIndexService {
 
   /**
    * 1. Score Évaluations (40%)
-   * Moyenne des scores des évaluations complétées, normalisée sur l'échelle GAMR (1-60)
-   * Les scores d'évaluation peuvent être sur différentes échelles, on les normalise en GAMR
+   * Moyenne des scores des évaluations complétées, normalisée sur l'échelle GAMRDIGITALE (1-60)
+   * Les scores d'évaluation peuvent être sur différentes échelles, on les normalise en GAMRDIGITALE
    */
   private static calculateEvaluationScore(evaluations: Array<{ totalScore: number | null }>): number {
-    if (evaluations.length === 0) return 1 // Minimum GAMR
+    if (evaluations.length === 0) return 1 // Minimum GAMRDIGITALE
 
     const validScores = evaluations
       .map(e => e.totalScore)
       .filter((score): score is number => score !== null && score !== undefined)
 
-    if (validScores.length === 0) return 1 // Minimum GAMR
+    if (validScores.length === 0) return 1 // Minimum GAMRDIGITALE
 
     const averageScore = validScores.reduce((sum, score) => sum + score, 0) / validScores.length
     
-    // Normaliser sur l'échelle GAMR (1-60)
+    // Normaliser sur l'échelle GAMRDIGITALE (1-60)
     // Si les scores sont sur 0-100, on les convertit en 1-60
     // Si les scores sont déjà sur 1-60, on les garde tels quels
     let normalizedScore: number
     
     if (averageScore <= 60) {
-      // Déjà sur l'échelle GAMR ou inférieur, garder tel quel
+      // Déjà sur l'échelle GAMRDIGITALE ou inférieur, garder tel quel
       normalizedScore = Math.max(1, Math.min(60, averageScore))
     } else {
       // Score sur 0-100, convertir en 1-60
@@ -169,7 +169,7 @@ export class SecurityIndexService {
 
   /**
    * 2. Couverture Actions Correctives (30%)
-   * Convertit le pourcentage en échelle GAMR (1-60)
+   * Convertit le pourcentage en échelle GAMRDIGITALE (1-60)
    * Si aucun risque critique, on considère que la sécurité est bonne (1 = risque faible)
    */
   private static calculateCorrectiveActionCoverage(
@@ -178,13 +178,13 @@ export class SecurityIndexService {
       actions: Array<{ id: string; status: string }>
     }>
   ): number {
-    // Si aucun risque critique, sécurité excellente (1 = risque faible sur échelle GAMR)
+    // Si aucun risque critique, sécurité excellente (1 = risque faible sur échelle GAMRDIGITALE)
     if (criticalRisks.length === 0) return 1
 
     const risksWithActions = criticalRisks.filter(risk => risk.actions.length > 0)
     const coveragePercentage = (risksWithActions.length / criticalRisks.length) * 100
     
-    // Convertir le pourcentage (0-100%) en échelle GAMR (1-60)
+    // Convertir le pourcentage (0-100%) en échelle GAMRDIGITALE (1-60)
     // 100% de couverture = 1 (risque faible), 0% = 60 (risque élevé)
     // Formule inversée : 60 - (pourcentage / 100) * 59
     return Math.max(1, Math.min(60, 60 - (coveragePercentage / 100) * 59))
@@ -192,7 +192,7 @@ export class SecurityIndexService {
 
   /**
    * 3. Taux Résolution Risques Critiques (20%)
-   * Convertit le pourcentage en échelle GAMR (1-60)
+   * Convertit le pourcentage en échelle GAMRDIGITALE (1-60)
    * Si aucun risque critique, on considère que la résolution est complète (1 = risque faible)
    */
   private static calculateCriticalRisksResolutionRate(
@@ -210,14 +210,14 @@ export class SecurityIndexService {
     
     const resolutionPercentage = (risksWithCompletedActions.length / criticalRisks.length) * 100
     
-    // Convertir le pourcentage (0-100%) en échelle GAMR (1-60)
+    // Convertir le pourcentage (0-100%) en échelle GAMRDIGITALE (1-60)
     // 100% de résolution = 1 (risque faible), 0% = 60 (risque élevé)
     return Math.max(1, Math.min(60, 60 - (resolutionPercentage / 100) * 59))
   }
 
   /**
    * 4. Conformité Objectifs Sécurité (10%)
-   * Convertit le ratio en échelle GAMR (1-60)
+   * Convertit le ratio en échelle GAMRDIGITALE (1-60)
    * Si aucune action pour les risques critiques, on considère la conformité comme complète (1 = risque faible)
    */
   private static calculateSecurityObjectivesCompliance(
@@ -237,7 +237,7 @@ export class SecurityIndexService {
     const completedActions = allActions.filter(action => action.status === 'COMPLETED')
     const compliancePercentage = (completedActions.length / allActions.length) * 100
     
-    // Convertir le pourcentage (0-100%) en échelle GAMR (1-60)
+    // Convertir le pourcentage (0-100%) en échelle GAMRDIGITALE (1-60)
     // 100% de conformité = 1 (risque faible), 0% = 60 (risque élevé)
     return Math.max(1, Math.min(60, 60 - (compliancePercentage / 100) * 59))
   }

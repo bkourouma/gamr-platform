@@ -427,7 +427,7 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gradient">
-            {mode === 'create' ? 'Nouvelle fiche GAMR' : 'Modifier la fiche GAMR'}
+            {mode === 'create' ? 'Nouvelle fiche GAMRDIGITALE' : 'Modifier la fiche GAMRDIGITALE'}
           </h2>
           <p className="text-gray-600">
             Analyse des risques pour {user?.tenant.name}
@@ -590,7 +590,7 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
                     className="flex items-center space-x-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
                   >
                     <Lightbulb className="w-4 h-4" />
-                    <span>Comment faire la GAMR?</span>
+                    <span>Comment faire la GAMRDIGITALE?</span>
                   </button>
                 </div>
 
@@ -940,7 +940,7 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Zap className="w-5 h-5" />
-                  <span>Résultat GAMR</span>
+                  <span>Résultat GAMRDIGITALE</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1317,14 +1317,14 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
         </div>
       )}
 
-      {/* Modal Guide GAMR */}
+      {/* Modal Guide GAMRDIGITALE */}
       {showGamrGuide && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-4xl max-h-[75vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
                 <Lightbulb className="w-6 h-6 text-yellow-500" />
-                <span>LA GRILLE D'ANALYSE DES MENACES ET RISQUES (GAMR)</span>
+                <span>LA GRILLE D'ANALYSE DES MENACES ET RISQUES (GAMRDIGITALE)</span>
               </h2>
               <button
                 onClick={() => setShowGamrGuide(false)}
@@ -1338,13 +1338,13 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
               {/* Introduction */}
               <div className="prose max-w-none">
                 <p className="text-gray-700 leading-relaxed">
-                  La «Grille d'Analyse des Menaces et Risques» (GAMR) est une méthodologie simplifiée et un outil pratique axé sur les facteurs de risques de l'entreprise (structure, outil de production et personnel), pour aider à l'exécution d'une Evaluation de Sécurité. Il s'agit d'un outil parmi d'autres qui est présenté ici à titre d'exemple.
+                  La «Grille d'Analyse des Menaces et Risques» (GAMRDIGITALE) est une méthodologie simplifiée et un outil pratique axé sur les facteurs de risques de l'entreprise (structure, outil de production et personnel), pour aider à l'exécution d'une Evaluation de Sécurité. Il s'agit d'un outil parmi d'autres qui est présenté ici à titre d'exemple.
                 </p>
               </div>
 
               {/* Objectifs */}
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-blue-900 mb-3">Objectifs de la GAMR</h3>
+                <h3 className="font-semibold text-blue-900 mb-3">Objectifs de la GAMRDIGITALE</h3>
                 <ul className="space-y-2 text-blue-800">
                   <li className="flex items-start space-x-2">
                     <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
@@ -1368,7 +1368,7 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
               {/* Mise à jour */}
               <div className="bg-yellow-50 p-4 rounded-lg">
                 <p className="text-yellow-800">
-                  <strong>Important :</strong> La GAMR doit être mise à jour aussi souvent que l'évolution des circonstances peut l'exiger afin de maintenir son efficacité. Cette tâche peut relever de l'autorité du Chef de la sécurité ou de l'organisme de sûreté conseil.
+                  <strong>Important :</strong> La GAMRDIGITALE doit être mise à jour aussi souvent que l'évolution des circonstances peut l'exiger afin de maintenir son efficacité. Cette tâche peut relever de l'autorité du Chef de la sécurité ou de l'organisme de sûreté conseil.
                 </p>
               </div>
 
@@ -1480,11 +1480,11 @@ export const RiskSheetForm: React.FC<RiskSheetFormProps> = ({
                 <ul className="space-y-2 text-green-800">
                   <li className="flex items-start space-x-2">
                     <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>La GAMR donne des indications précises sur les menaces, l'identification des cibles potentielles et leur degré de vulnérabilité</span>
+                    <span>La GAMRDIGITALE donne des indications précises sur les menaces, l'identification des cibles potentielles et leur degré de vulnérabilité</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>La GAMR dûment remplie constitue la base de l'élaboration d'un plan de sécurité et de sûreté de l'entreprise</span>
+                    <span>La GAMRDIGITALE dûment remplie constitue la base de l'élaboration d'un plan de sécurité et de sûreté de l'entreprise</span>
                   </li>
                 </ul>
               </div>
