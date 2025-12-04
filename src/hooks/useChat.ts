@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react'
 
+// API URL configuration - use relative path for production (handled by reverse proxy)
+const isDev = import.meta.env.DEV
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+
 // Define types directly in this file
 export interface ChatMessage {
   id: string
@@ -74,7 +78,7 @@ export function useChat(): UseChatReturn {
       const token = localStorage.getItem('token')
       
       // Call RAG API with simplified request
-      const response = await fetch('http://localhost:3002/api/rag/query', {
+      const response = await fetch(`${API_BASE_URL}/rag/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
